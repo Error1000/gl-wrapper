@@ -6,7 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="efb3930f-a966-48e8-a961-4513db482a27" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -82,6 +81,14 @@
       <option name="presentableId" value="Default" />
       <updated>1581179005452</updated>
     </task>
+    <task id="LOCAL-00001" summary="simple change">
+      <created>1581249209425</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1581249209425</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="UnknownFeatures">
@@ -97,6 +104,10 @@
       </list>
     </option>
   </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="simple change" />
+    <option name="LAST_COMMIT_MESSAGE" value="simple change" />
+  </component>
   <component name="WindowStateProjectService">
     <state x="555" y="188" width="804" height="677" key="#Project_Structure" timestamp="1581179757411">
       <screen x="0" y="0" width="1920" height="1051" />
@@ -106,10 +117,10 @@
       <screen x="0" y="0" width="1920" height="1051" />
     </state>
     <state x="418" y="184" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1920.1051@0.0.1920.1051" timestamp="1581182411461" />
-    <state x="95" y="123" width="764" height="805" key="CommitChangelistDialog2" timestamp="1581245876716">
+    <state x="95" y="123" width="764" height="805" key="CommitChangelistDialog2" timestamp="1581249209165">
       <screen x="0" y="0" width="1920" height="1051" />
     </state>
-    <state x="95" y="123" width="764" height="805" key="CommitChangelistDialog2/0.0.1920.1051@0.0.1920.1051" timestamp="1581245876716" />
+    <state x="95" y="123" width="764" height="805" key="CommitChangelistDialog2/0.0.1920.1051@0.0.1920.1051" timestamp="1581249209165" />
     <state x="743" y="284" width="428" height="484" key="FileChooserDialogImpl" timestamp="1581179323790">
       <screen x="0" y="0" width="1920" height="1051" />
     </state>
@@ -134,10 +145,10 @@
       <screen x="0" y="0" width="1920" height="1051" />
     </state>
     <state x="506" y="151" key="SettingsEditor/0.0.1920.1051@0.0.1920.1051" timestamp="1581243076011" />
-    <state x="257" y="445" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1581245880707">
+    <state x="276" y="432" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1581249233434">
       <screen x="0" y="0" width="1920" height="1051" />
     </state>
-    <state x="257" y="445" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1920.1051@0.0.1920.1051" timestamp="1581245880707" />
+    <state x="276" y="432" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1920.1051@0.0.1920.1051" timestamp="1581249233434" />
     <state x="622" y="240" key="run.anything.popup" timestamp="1581179335986">
       <screen x="0" y="0" width="1920" height="1051" />
     </state>
