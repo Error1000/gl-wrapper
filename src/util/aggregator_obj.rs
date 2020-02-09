@@ -43,12 +43,11 @@ impl VAO {
         Some(())
     }
 
-    pub fn attach_bound_vbo_to_bound_vao<ET>(
+    pub fn attach_bound_vbo_to_bound_vao<ET: 'static>(
         self: &mut Self,
         bo: &buffer_obj::VBO<ET>,
         index: GLuint,
-    ) -> Result<(), &'static str>
-    where ET: 'static{
+    ) -> Result<(), &'static str> {
         unsafe {
             let t = match api::type_to_gl_enum::<ET>() {
                 Some(r) => r,
