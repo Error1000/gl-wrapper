@@ -4,7 +4,10 @@
     <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="efb3930f-a966-48e8-a961-4513db482a27" name="Default Changelist" comment="" />
+    <list default="true" id="efb3930f-a966-48e8-a961-4513db482a27" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.toml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -17,6 +20,9 @@
       </list>
     </option>
   </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
   <component name="MacroExpansionManager">
     <option name="directoryName" value="HHDhaUAW" />
   </component>
@@ -28,6 +34,7 @@
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
+    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="org.rust.cargo.project.model.PROJECT_DISCOVERY" value="true" />
@@ -88,6 +95,10 @@
       <screen x="0" y="0" width="1920" height="1051" />
     </state>
     <state x="418" y="184" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1920.1051@0.0.1920.1051" timestamp="1581182411461" />
+    <state x="95" y="123" width="764" height="805" key="CommitChangelistDialog2" timestamp="1581244107559">
+      <screen x="0" y="0" width="1920" height="1051" />
+    </state>
+    <state x="95" y="123" width="764" height="805" key="CommitChangelistDialog2/0.0.1920.1051@0.0.1920.1051" timestamp="1581244107559" />
     <state x="743" y="284" width="428" height="484" key="FileChooserDialogImpl" timestamp="1581179323790">
       <screen x="0" y="0" width="1920" height="1051" />
     </state>
