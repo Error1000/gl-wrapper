@@ -4,8 +4,9 @@ extern crate gl_wrapper;
 
 use gl_wrapper::render::*;
 use gl_wrapper::util::*;
-
 use gl_wrapper::util::buffer_obj::BOFunc;
+use gl_wrapper::render::texture::TextureFunc;
+
 use glutin::dpi::PhysicalSize;
 use std::convert::TryInto;
 use image::{GenericImageView};
@@ -20,7 +21,6 @@ use glutin::event_loop::{ControlFlow, EventLoop};
 use glutin::window::WindowBuilder;
 
 use std::path::Path;
-use gl_wrapper::render::texture::TextureFunc;
 
 // Vertex data
 static VERTEX_DATA: [GLfloat; 8] = [
