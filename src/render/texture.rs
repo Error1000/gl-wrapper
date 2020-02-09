@@ -91,6 +91,7 @@ impl Texture2D{
         Self(TextureBase::new(Self::get_type()))
     }
 
+    /// CPP = channels per pixel ( examples: RGBA = 4 channels, RGB = 3 channels, RG = 2 channels, R = 1 channel, ... )
     pub fn upload_data_to_bound_texture<ET>(self: &mut Self, size: [GLint; 2], data: &[ET], cpp: u8)-> Option<()> where ET: 'static{
         let l: i32 = match data.len().try_into(){
             Ok(v) => v,
@@ -110,6 +111,7 @@ impl Texture2DArray{
         Self(TextureBase::new(Self::get_type()))
     }
 
+    /// CPP = channels per pixel ( examples: RGBA = 4 channels, RGB = 3 channels, RG = 2 channels, R = 1 channel, ... )
     pub fn upload_data_to_bound_texture<ET>(self: &mut Self, size: [GLint; 3], data: &[ET], cpp: u8)-> Option<()> where ET: 'static{
         let l: i32 = match data.len().try_into(){
             Ok(v) => v,
@@ -129,6 +131,7 @@ impl Texture3D{
         Self(TextureBase::new(Self::get_type()))
     }
 
+    /// CPP = channels per pixel ( examples: RGBA = 4 channels, RGB = 3 channels, RG = 2 channels, R = 1 channel, ... )
     pub fn upload_data_to_bound_texture<ET>(self: &mut Self, size: [GLint; 3], data: &[ET], cpp: u8)-> Option<()> where ET: 'static{
         let l: i32 = match data.len().try_into(){
             Ok(v) => v,

@@ -86,6 +86,7 @@ pub struct VertexShader(Shader);
 pub struct FragmentShader(Shader);
 
 impl VertexShader {
+    /// This just runs Shader::new to take a look at that
     pub fn new(src: &str) -> Result<Self, String> {
         Ok(VertexShader(Shader::new(src, gl::VERTEX_SHADER)?))
     }
@@ -97,6 +98,7 @@ impl Into<Shader> for VertexShader{
 }
 
 impl FragmentShader {
+    /// This just runs Shader::new to take a look at that
     pub fn new(src: &str) -> Result<Self, String> {
         Ok(FragmentShader(Shader::new(src, gl::FRAGMENT_SHADER)?))
     }
