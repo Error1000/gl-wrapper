@@ -11,7 +11,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-#![feature(stmt_expr_attributes)]
 
 extern crate glutin;
 extern crate image;
@@ -158,7 +157,6 @@ fn main() {
     let ibo_len = ind_ibo.get_size().try_into().expect("The number of triangles you have is either negative, or too big!");
     let ibo_enum_type = gl_wrapper::api::type_to_gl_enum::<GLushort>().unwrap();
     let render=
-        #[inline]
         move ||{
         unsafe{
             gl::Clear(gl::COLOR_BUFFER_BIT);
