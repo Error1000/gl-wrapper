@@ -73,9 +73,16 @@ impl<ET> VBO<ET> {
 }
 
 impl<ET> IBO<ET> {
-   pub fn new() -> Self {
+    pub fn new() -> Self {
        IBO::<ET> ( BaseBO::<ET>::new() )
    }
+
+    pub fn with_data(data: &[ET], usage: GLenum) -> Option<Self>{
+        let mut r = Self::new();
+        r.bind_bo();
+        r.upload_to_bound_bo(data, usage)?;
+        Some(r)
+    }
 
     // TODO: Consider renaming this
     pub fn upload_to_bound_bo(self: &mut Self, data: &[ET], usage: GLenum) -> Option<()>{
