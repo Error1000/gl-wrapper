@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CargoProjects">
+    <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="efb3930f-a966-48e8-a961-4513db482a27" name="Default Changelist" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Rust File" />
+      </list>
+    </option>
+  </component>
+  <component name="MacroExpansionManager">
+    <option name="directoryName" value="HHDhaUAW" />
+  </component>
+  <component name="ProjectId" id="1XX4FyDcbRcO1lzXCZ8y6pG7DMt" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="org.rust.cargo.project.model.PROJECT_DISCOVERY" value="true" />
+    <property name="org.rust.hideDetachedFileNotifications/home/dan/Documents/Coding/Rust/OpenGLWrapper/src/util/mod.rs" value="true" />
+    <property name="org.rust.hideDetachedFileNotifications/home/dan/Documents/Coding/Rust/gl-wrapper/src/API.rs" value="true" />
+    <property name="org.rust.hideDetachedFileNotifications/home/dan/Documents/Coding/Rust/gl-wrapper/src/render/mod.rs" value="true" />
+    <property name="org.rust.hideNoCargoProjectNotifications/home/dan/Documents/Coding/Rust/OpenGLWrapper/src/main.rs" value="true" />
+    <property name="org.rust.hideNoCargoProjectNotifications/home/dan/Documents/Coding/Rust/gl-wrapper/src/main.rs" value="true" />
+    <property name="project.structure.last.edited" value="Artifacts" />
+    <property name="project.structure.proportion" value="0.0" />
+    <property name="project.structure.side.proportion" value="0.2" />
+    <property name="settings.editor.selected.configurable" value="configurable.group.tools" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src" />
+      <recent name="$PROJECT_DIR$" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="gl-wrapper" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
+      <option name="channel" value="DEFAULT" />
+      <option name="command" value="run" />
+      <option name="allFeatures" value="false" />
+      <option name="nocapture" value="false" />
+      <option name="emulateTerminal" value="true" />
+      <option name="backtrace" value="SHORT" />
+      <option name="workingDirectory" value="file://$PROJECT_DIR$" />
+      <envs />
+      <method v="2">
+        <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="RustProjectSettings">
+    <option name="toolchainHomeDirectory" value="/usr/bin" />
+    <option name="version" value="2" />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="efb3930f-a966-48e8-a961-4513db482a27" name="Default Changelist" comment="" />
+      <created>1581179005452</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1581179005452</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="UnknownFeatures">
+    <option featureType="com.intellij.fileTypeFactory" implementationName="*.rs" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="555" y="188" width="804" height="677" key="#Project_Structure" timestamp="1581179757411">
+      <screen x="0" y="0" width="1920" height="1051" />
+    </state>
+    <state x="555" y="188" width="804" height="677" key="#Project_Structure/0.0.1920.1051@0.0.1920.1051" timestamp="1581179757411" />
+    <state x="418" y="184" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1581182411461">
+      <screen x="0" y="0" width="1920" height="1051" />
+    </state>
+    <state x="418" y="184" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1920.1051@0.0.1920.1051" timestamp="1581182411461" />
+    <state x="743" y="284" width="428" height="484" key="FileChooserDialogImpl" timestamp="1581179323790">
+      <screen x="0" y="0" width="1920" height="1051" />
+    </state>
+    <state x="743" y="284" width="428" height="484" key="FileChooserDialogImpl/0.0.1920.1051@0.0.1920.1051" timestamp="1581179323790" />
+    <state width="1878" height="279" key="GridCell.Tab.0.bottom" timestamp="1581243662431">
+      <screen x="0" y="0" width="1920" height="1051" />
+    </state>
+    <state width="1878" height="279" key="GridCell.Tab.0.bottom/0.0.1920.1051@0.0.1920.1051" timestamp="1581243662431" />
+    <state width="1878" height="279" key="GridCell.Tab.0.center" timestamp="1581243662431">
+      <screen x="0" y="0" width="1920" height="1051" />
+    </state>
+    <state width="1878" height="279" key="GridCell.Tab.0.center/0.0.1920.1051@0.0.1920.1051" timestamp="1581243662431" />
+    <state width="1878" height="279" key="GridCell.Tab.0.left" timestamp="1581243662431">
+      <screen x="0" y="0" width="1920" height="1051" />
+    </state>
+    <state width="1878" height="279" key="GridCell.Tab.0.left/0.0.1920.1051@0.0.1920.1051" timestamp="1581243662431" />
+    <state width="1878" height="279" key="GridCell.Tab.0.right" timestamp="1581243662431">
+      <screen x="0" y="0" width="1920" height="1051" />
+    </state>
+    <state width="1878" height="279" key="GridCell.Tab.0.right/0.0.1920.1051@0.0.1920.1051" timestamp="1581243662431" />
+    <state x="506" y="151" key="SettingsEditor" timestamp="1581243076011">
+      <screen x="0" y="0" width="1920" height="1051" />
+    </state>
+    <state x="506" y="151" key="SettingsEditor/0.0.1920.1051@0.0.1920.1051" timestamp="1581243076011" />
+    <state x="622" y="240" key="run.anything.popup" timestamp="1581179335986">
+      <screen x="0" y="0" width="1920" height="1051" />
+    </state>
+    <state x="622" y="240" key="run.anything.popup/0.0.1920.1051@0.0.1920.1051" timestamp="1581179335986" />
+    <state x="685" y="441" width="544" height="171" key="vcs.readOnlyHandler.ReadOnlyStatusDialog" timestamp="1581183271721">
+      <screen x="0" y="0" width="1920" height="1051" />
+    </state>
+    <state x="685" y="441" width="544" height="171" key="vcs.readOnlyHandler.ReadOnlyStatusDialog/0.0.1920.1051@0.0.1920.1051" timestamp="1581183271721" />
+  </component>
+</project>

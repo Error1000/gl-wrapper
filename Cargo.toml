@@ -1,0 +1,24 @@
+[package]
+name = "gl-wrapper"
+version = "0.1.0"
+authors = ["Error1000 <udreadanmihai@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[dependencies]
+gl = "0.14"
+glutin = "0.23"
+image = "0.23"
+
+[build-dependencies]
+gl_generator = "0.14"
+
+
+[profile.release]
+opt-level=3
+lto=true
+
+[target.x86_64-pc-windows-gnu]
+linker = "/usr/bin/x86_64-w64-mingw32-gcc"
+ar = "/usr/x86_64-w64-mingw32/bin/ar"
+
