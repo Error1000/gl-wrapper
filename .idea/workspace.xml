@@ -4,11 +4,9 @@
     <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="efb3930f-a966-48e8-a961-4513db482a27" name="Default Changelist" comment="split">
+    <list default="true" id="efb3930f-a966-48e8-a961-4513db482a27" name="Default Changelist" comment="forgot to add some files">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main.rs" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -104,7 +102,21 @@
       <option name="project" value="LOCAL" />
       <updated>1581249521292</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="split example from lib so that image is not needed when building lib">
+      <created>1581250724467</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1581250724467</updated>
+    </task>
+    <task id="LOCAL-00005" summary="forgot to add some files">
+      <created>1581250977976</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1581250977976</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="UnknownFeatures">
@@ -122,7 +134,9 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="simple change" />
-    <option name="LAST_COMMIT_MESSAGE" value="simple change" />
+    <MESSAGE value="split example from lib so that image is not needed when building lib" />
+    <MESSAGE value="forgot to add some files" />
+    <option name="LAST_COMMIT_MESSAGE" value="forgot to add some files" />
   </component>
   <component name="WindowStateProjectService">
     <state x="555" y="188" width="804" height="677" key="#Project_Structure" timestamp="1581179757411">
@@ -133,34 +147,42 @@
       <screen x="0" y="0" width="1920" height="1051" />
     </state>
     <state x="203" y="190" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1920.1051@0.0.1920.1051" timestamp="1581250319911" />
-    <state x="95" y="123" width="764" height="805" key="CommitChangelistDialog2" timestamp="1581250292578">
+    <state x="95" y="123" width="764" height="805" key="CommitChangelistDialog2" timestamp="1581250996989">
       <screen x="0" y="0" width="1920" height="1051" />
     </state>
-    <state x="95" y="123" width="764" height="805" key="CommitChangelistDialog2/0.0.1920.1051@0.0.1920.1051" timestamp="1581250292578" />
+    <state x="95" y="123" width="764" height="805" key="CommitChangelistDialog2/0.0.1920.1051@0.0.1920.1051" timestamp="1581250996989" />
     <state x="743" y="284" width="428" height="484" key="FileChooserDialogImpl" timestamp="1581249591702">
       <screen x="0" y="0" width="1920" height="1051" />
     </state>
     <state x="743" y="284" width="428" height="484" key="FileChooserDialogImpl/0.0.1920.1051@0.0.1920.1051" timestamp="1581249591702" />
-    <state width="914" height="278" key="GridCell.Tab.0.bottom" timestamp="1581250195097">
+    <state width="914" height="278" key="GridCell.Tab.0.bottom" timestamp="1581250960493">
       <screen x="0" y="0" width="1920" height="1051" />
     </state>
-    <state width="914" height="278" key="GridCell.Tab.0.bottom/0.0.1920.1051@0.0.1920.1051" timestamp="1581250195097" />
-    <state width="914" height="278" key="GridCell.Tab.0.center" timestamp="1581250195096">
+    <state width="914" height="278" key="GridCell.Tab.0.bottom/0.0.1920.1051@0.0.1920.1051" timestamp="1581250960493" />
+    <state width="914" height="278" key="GridCell.Tab.0.center" timestamp="1581250960492">
       <screen x="0" y="0" width="1920" height="1051" />
     </state>
-    <state width="914" height="278" key="GridCell.Tab.0.center/0.0.1920.1051@0.0.1920.1051" timestamp="1581250195096" />
-    <state width="914" height="278" key="GridCell.Tab.0.left" timestamp="1581250195096">
+    <state width="914" height="278" key="GridCell.Tab.0.center/0.0.1920.1051@0.0.1920.1051" timestamp="1581250960492" />
+    <state width="914" height="278" key="GridCell.Tab.0.left" timestamp="1581250960492">
       <screen x="0" y="0" width="1920" height="1051" />
     </state>
-    <state width="914" height="278" key="GridCell.Tab.0.left/0.0.1920.1051@0.0.1920.1051" timestamp="1581250195096" />
-    <state width="914" height="278" key="GridCell.Tab.0.right" timestamp="1581250195096">
+    <state width="914" height="278" key="GridCell.Tab.0.left/0.0.1920.1051@0.0.1920.1051" timestamp="1581250960492" />
+    <state width="914" height="278" key="GridCell.Tab.0.right" timestamp="1581250960493">
       <screen x="0" y="0" width="1920" height="1051" />
     </state>
-    <state width="914" height="278" key="GridCell.Tab.0.right/0.0.1920.1051@0.0.1920.1051" timestamp="1581250195096" />
+    <state width="914" height="278" key="GridCell.Tab.0.right/0.0.1920.1051@0.0.1920.1051" timestamp="1581250960493" />
     <state x="506" y="151" key="SettingsEditor" timestamp="1581243076011">
       <screen x="0" y="0" width="1920" height="1051" />
     </state>
     <state x="506" y="151" key="SettingsEditor/0.0.1920.1051@0.0.1920.1051" timestamp="1581243076011" />
+    <state x="75" y="261" width="804" height="528" key="Vcs.Push.Dialog.v2" timestamp="1581250869977">
+      <screen x="0" y="0" width="1920" height="1051" />
+    </state>
+    <state x="75" y="261" width="804" height="528" key="Vcs.Push.Dialog.v2/0.0.1920.1051@0.0.1920.1051" timestamp="1581250869977" />
+    <state x="221" y="262" width="505" height="526" key="com.intellij.openapi.vcs.changes.SpecificFilesViewDialog" timestamp="1581250750149">
+      <screen x="0" y="0" width="1920" height="1051" />
+    </state>
+    <state x="221" y="262" width="505" height="526" key="com.intellij.openapi.vcs.changes.SpecificFilesViewDialog/0.0.1920.1051@0.0.1920.1051" timestamp="1581250750149" />
     <state x="276" y="432" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1581249233434">
       <screen x="0" y="0" width="1920" height="1051" />
     </state>
