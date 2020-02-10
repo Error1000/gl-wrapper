@@ -40,7 +40,7 @@ pub trait TextureFunc{
     fn bind_texture_for_data(self: &Self){
         unsafe{
             gl::ActiveTexture(gl::TEXTURE0);
-            gl::BindTexture(Self::get_type(), self.get_base_tex().id);
+            gl::BindTexture(Self::get_type(), self.get_tex_base().id);
         }
     }
 
@@ -75,7 +75,7 @@ pub trait TextureFunc{
     }
 
     fn get_type() -> GLenum;
-    fn get_base_tex(self: &Self) -> &TextureBase;
+    fn get_tex_base(self: &Self) -> &TextureBase;
 }
 
 
@@ -152,7 +152,7 @@ impl TextureFunc for Texture2D{
     #[inline]
     fn get_type() -> GLenum { gl::TEXTURE_2D }
     #[inline]
-    fn get_base_tex(self: &Self) -> &TextureBase { &self.0 }
+    fn get_tex_base(self: &Self) -> &TextureBase { &self.0 }
 
 }
 
@@ -160,12 +160,12 @@ impl TextureFunc for Texture2DArray{
     #[inline]
     fn get_type() -> GLenum { gl::TEXTURE_2D_ARRAY }
     #[inline]
-    fn get_base_tex(self: &Self) -> &TextureBase { &self.0 }
+    fn get_tex_base(self: &Self) -> &TextureBase { &self.0 }
 }
 
 impl TextureFunc for Texture3D{
     #[inline]
     fn get_type() -> GLenum { gl::TEXTURE_3D }
     #[inline]
-    fn get_base_tex(self: &Self) -> &TextureBase { &self.0 }
+    fn get_tex_base(self: &Self) -> &TextureBase { &self.0 }
 }

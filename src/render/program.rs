@@ -21,7 +21,7 @@ impl Drop for Program {
 }
 
 impl Program {
-    pub fn new(shaders: &[&Shader]) -> Result<Self, String> {
+    pub fn new(shaders: &[&ShaderBase]) -> Result<Self, String> {
         let r = Program {
                 id: unsafe{ gl::CreateProgram() },
                 uniform_ids: HashMap::new(),
@@ -103,11 +103,7 @@ impl Program {
     }
 
     pub fn load_sampler(self: &mut Self, name: &'static str) -> Option<()> {
-        if !self.uniform_ids.contains_key(name){
-            let s_id = self.get_id_of(name, gl::GetUniformLocation)?;
-            self.uniform_ids.insert(name, s_id);
-        }
-        Some(())
+        self.load_uniform(name)
     }
 
     pub fn load_attribute(self: &mut Self, name: &'static str) -> Option<()> {
@@ -130,7 +126,7 @@ impl Program {
     pub fn set_uniform_u32(self: &mut Self, id: GLint, val: u32) {
         unsafe { gl::Uniform1ui(id, val); }
     }
-    pub fn st_uniform_f32(self: &mut Self, id: GLint, val: f32) {
+    pub fn set_uniform_f32(self: &mut Self, id: GLint, val: f32) {
         unsafe { gl::Uniform1f(id, val); }
     }
 

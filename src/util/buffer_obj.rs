@@ -3,15 +3,15 @@ use std::convert::TryInto;
 use std::marker::PhantomData;
 use std::mem::size_of;
 
-pub struct BaseBO<ET>{
+pub struct BOBase<ET>{
     id: GLuint,
     size: isize,
     data: PhantomData<ET>,
 }
 
-impl<ET> BaseBO<ET>{
+impl<ET> BOBase<ET>{
     fn new() -> Self{
-        let mut r = BaseBO::<ET>{
+        let mut r = BOBase::<ET>{
             id: 0,
             size: 0,
             data: PhantomData,
@@ -19,9 +19,10 @@ impl<ET> BaseBO<ET>{
         unsafe { gl::GenBuffers(1, &mut r.id); }
         r
     }
+    fn get_size(self: &Self) -> isize{ self.size }
 }
 
-impl<ET> Drop for BaseBO<ET>{
+impl<ET> Drop for BOBase<ET>{
     fn drop(self: &mut Self) {
         unsafe { gl::DeleteBuffers(1, &(self.id)); }
     }
@@ -29,13 +30,13 @@ impl<ET> Drop for BaseBO<ET>{
 
 
 
-pub struct VBO<ET> (BaseBO<ET>, u8);
-pub struct IBO<ET> (BaseBO<ET>);
+pub struct VBO<ET> (BOBase<ET>, u8);
+pub struct IBO<ET> (BOBase<ET>);
 
 
 impl<ET> VBO<ET> {
     pub fn new(elem_per_vert: u8) -> Self {
-        VBO::<ET> (BaseBO::<ET>::new(), elem_per_vert)
+        VBO::<ET> (BOBase::<ET>::new(), elem_per_vert)
     }
 
     pub fn with_data(elem_per_vert: u8, data: &[ET], usage: GLenum) -> Option<Self>{
@@ -74,7 +75,7 @@ impl<ET> VBO<ET> {
 
 impl<ET> IBO<ET> {
     pub fn new() -> Self {
-       IBO::<ET> ( BaseBO::<ET>::new() )
+       IBO::<ET> ( BOBase::<ET>::new() )
    }
 
     pub fn with_data(data: &[ET], usage: GLenum) -> Option<Self>{
@@ -108,29 +109,29 @@ impl<ET> IBO<ET> {
 
 pub trait BOFunc<ET> {
     fn bind_bo(self: &Self){
-        unsafe { gl::BindBuffer(Self::get_type(), self.get_base_bo().id) }
+        unsafe { gl::BindBuffer(Self::get_type(), self.get_bo_base().id) }
     }
 
     fn get_size(self: &Self) -> isize;
-    fn get_base_bo(self: &Self) -> &BaseBO<ET>;
+    fn get_bo_base(self: &Self) -> &BOBase<ET>;
     fn get_type() -> GLenum;
 }
 
 
 impl<ET> BOFunc<ET> for VBO<ET> {
     #[inline]
-    fn get_size(self: &Self) -> isize { self.get_base_bo().size }
+    fn get_size(self: &Self) -> isize { self.get_bo_base().size }
     #[inline]
-    fn get_base_bo(self: &Self) -> &BaseBO<ET> { &self.0 }
+    fn get_bo_base(self: &Self) -> &BOBase<ET> { &self.0 }
     #[inline]
     fn get_type() -> GLenum { gl::ARRAY_BUFFER }
 }
 
 impl<ET> BOFunc<ET> for IBO<ET> {
     #[inline]
-    fn get_size(self: &Self) -> isize { self.get_base_bo().size }
+    fn get_size(self: &Self) -> isize { self.get_bo_base().size }
     #[inline]
-    fn get_base_bo(self: &Self) -> &BaseBO<ET> { &self.0 }
+    fn get_bo_base(self: &Self) -> &BOBase<ET> { &self.0 }
     #[inline]
     fn get_type() -> GLenum { gl::ELEMENT_ARRAY_BUFFER }
 }

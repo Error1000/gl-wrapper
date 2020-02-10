@@ -5,21 +5,21 @@ use std::ffi::CString;
 use std::ptr;
 use std::str;
 
-pub struct Shader {
+pub struct ShaderBase {
     id: GLuint
 }
 
-impl Drop for Shader {
+impl Drop for ShaderBase {
     fn drop(self: &mut Self) {
         unsafe { gl::DeleteShader(self.id); }
     }
 }
 
-impl Shader {
+impl ShaderBase {
     /// WARNING: Pretty slow if error occurs
     /// NOTE: Just in general shader compilation is slow so use new only when you need to
     pub fn new(src: &str, sh_type: GLenum) -> Result<Self, String> {
-        let r = Shader {
+        let r = ShaderBase {
                 id: unsafe{ gl::CreateShader(sh_type) },
         };
         unsafe {
@@ -72,7 +72,7 @@ impl Shader {
         }
         Ok(r)
     }
-  
+
    // NEEDED BY Program
    pub(crate) fn get_id(self: &Self) -> GLuint {
        self.id
@@ -82,29 +82,32 @@ impl Shader {
 
 
 
-pub struct VertexShader(Shader);
-pub struct FragmentShader(Shader);
+pub struct VertexShader(ShaderBase);
+pub struct FragmentShader(ShaderBase);
 
 impl VertexShader {
     /// This just runs Shader::new to take a look at that
     pub fn new(src: &str) -> Result<Self, String> {
-        Ok(VertexShader(Shader::new(src, gl::VERTEX_SHADER)?))
+        Ok(VertexShader(ShaderBase::new(src, gl::VERTEX_SHADER)?))
     }
+
+    pub fn get_shader_base(self: &Self) -> &ShaderBase { &self.0 }
 }
 
-impl Into<Shader> for VertexShader{
+impl Into<ShaderBase> for VertexShader{
     // Consume VertexShader and pass ownership of it's only value as output
-    fn into(self: Self) -> Shader{ self.0 }
+    fn into(self: Self) -> ShaderBase{ self.0 }
 }
 
 impl FragmentShader {
     /// This just runs Shader::new to take a look at that
     pub fn new(src: &str) -> Result<Self, String> {
-        Ok(FragmentShader(Shader::new(src, gl::FRAGMENT_SHADER)?))
+        Ok(FragmentShader(ShaderBase::new(src, gl::FRAGMENT_SHADER)?))
     }
+    pub fn get_shader_base(self: &Self) -> &ShaderBase { &self.0 }
 }
 
-impl Into<Shader> for FragmentShader{
+impl Into<ShaderBase> for FragmentShader{
     // Consume VertexShader and pass ownership of it's only value as output
-    fn into(self: Self) -> Shader{ self.0 }
+    fn into(self: Self) -> ShaderBase{ self.0 }
 }
