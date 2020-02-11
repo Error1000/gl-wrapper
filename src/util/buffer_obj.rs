@@ -19,7 +19,7 @@ impl<ET> BOBase<ET>{
         unsafe { gl::GenBuffers(1, &mut r.id); }
         r
     }
-    fn get_size(self: &Self) -> isize{ self.size }
+    pub fn get_size(self: &Self) -> isize{ self.size }
 }
 
 impl<ET> Drop for BOBase<ET>{

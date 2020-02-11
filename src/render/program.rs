@@ -130,6 +130,35 @@ impl Program {
         unsafe { gl::Uniform1f(id, val); }
     }
 
+    pub fn set_vec3_f32(self: &mut Self, id: GLint, val: &[f32; 3]){
+        unsafe{ gl::Uniform3fv(id, 1, val as *const f32); }
+    }
+    pub fn set_vec3_i32(self: &mut Self, id: GLint, val: &[i32; 3]){
+        unsafe{ gl::Uniform3iv(id, 1, val as *const i32); }
+    }
+    pub fn set_vec3_u32(self: &mut Self, id: GLint, val: &[u32; 3]){
+        unsafe{ gl::Uniform3uiv(id, 1, val as *const u32); }
+    }
+
+
+    pub fn set_vec2_f32(self: &mut Self, id: GLint, val: &[f32; 2]){
+        unsafe{ gl::Uniform2fv(id, 1, val as *const f32); }
+    }
+    pub fn set_vec2_i32(self: &mut Self, id: GLint, val: &[i32; 2]){
+        unsafe{ gl::Uniform2iv(id, 1, val as *const i32); }
+    }
+    pub fn set_vec2_u32(self: &mut Self, id: GLint, val: &[u32; 2]){
+        unsafe{ gl::Uniform2uiv(id, 1, val as *const u32); }
+    }
+
+    pub fn set_uniform_mat3(self: &mut Self, id: GLint, val: &[f32; 3*3]){
+        unsafe{ gl::UniformMatrix3fv(id, 1, gl::FALSE, val as *const f32); }
+    }
+
+    pub fn set_uniform_mat4(self: &mut Self, id: GLint, val: &[f32; 4*4]){
+        unsafe{ gl::UniformMatrix4fv(id, 1, gl::FALSE, val as *const f32); }
+    }
+
     pub fn get_uniform_id(self: &Self, name: &'static str) -> Option<GLuint> {
         Some(*(self.uniform_ids.get(name)?))
     }

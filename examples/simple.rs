@@ -148,7 +148,6 @@ fn main() {
     // Since these values won't change and the gl::DrawElements is in the hot path we are going to cache these values now just to make things simpler and faster
     let ibo_len = ind_ibo.get_size().try_into().expect("The number of triangles you have is either negative, or too big!");
     let ibo_enum_type = gl_wrapper::api::type_to_gl_enum::<GLushort>().unwrap();
-
     let render=
         move ||{
         unsafe{
