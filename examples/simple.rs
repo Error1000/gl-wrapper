@@ -69,6 +69,7 @@ fn main() {
     println!(
         "Window created but hidden so that we don't have an annoying hang as the program loads!"
     );
+
     let v = unsafe {
         let data = CStr::from_ptr(gl::GetString(gl::VERSION) as *const i8)
             .to_bytes()
@@ -90,33 +91,30 @@ fn main() {
     program.bind_program();
     program
         .load_attribute("position")
-        .expect("Failed to load data from shader!");
+        .expect("Failed to load attribute from shader!");
     program
         .load_attribute("tex_coord")
-        .expect("Failed to load data from shader!");
+        .expect("Failed to load attribute from shader!");
     program
         .load_sampler("obj_tex")
-        .expect("Failed to load data from shader!");
+        .expect("Failed to load attribute from shader!");
     println!("Done!");
 
     // Load textures
     println!("Loading textures ...");
     let im = image::open(&Path::new("apple.png"))
-        .expect("Failed to load texture! Are you sure it exists?");
+        .expect("Failed to read texture from disk! Are you sure it exists?");
     let data: &[u8] = &im.to_bytes()[..];
     let mut t = texture::Texture2D::new();
     t.bind_texture_for_data();
-    t.upload_data_to_bound_texture([im.width().try_into().expect("Image size is either too big or negative, in any of those cases that's not a good sign!"),
+    t.upload_data_to_bound_texture([
+                                       im.width().try_into().expect("Image size is either too big or negative, in any of those cases that's not a good sign!"),
                                        im.height().try_into().expect("Image size is either too big or negative, in any of those cases that's not a good sign!")
-                                   ],
-                                   data,
+                                        ],
+                                    data,
                                    4 /* RGBA has 4 channel per pixel*/
     ).expect("Failed to upload texture data to gpu!");
-    t.bind_texture_for_sampling(
-        program
-            .get_sampler_id("obj_tex")
-            .expect("Can't access a value that is not loaded from shader!"),
-    );
+    t.bind_texture_for_sampling(program.get_sampler_id("obj_tex"));
     println!("Done!");
 
     // Load mesh data ( indices, vertices, uv data )
@@ -127,23 +125,13 @@ fn main() {
     // NOTE: Creating a vbo with data auto binds it, creating a vbo using new does not
     let pos_vbo = buffer_obj::VBO::<GLfloat>::with_data(2, &VERTEX_DATA, gl::STATIC_DRAW)
         .expect("Failed to upload data to vbo!");
-    a.attach_bound_vbo_to_bound_vao(
-        &pos_vbo,
-        program
-            .get_attribute_id("position")
-            .expect("Can't access a value that is not loaded from shader!"),
-    )
-    .expect("Failed to attach vob to vao!");
+    a.attach_bound_vbo_to_bound_vao(&pos_vbo, program.get_attribute_id("position"))
+        .expect("Failed to attach vob to vao!");
 
     let tex_vbo = buffer_obj::VBO::<GLfloat>::with_data(2, &TEX_DATA, gl::STATIC_DRAW)
         .expect("Failed to upload data to vbo!");
-    a.attach_bound_vbo_to_bound_vao(
-        &tex_vbo,
-        program
-            .get_attribute_id("tex_coord")
-            .expect("Can't access a value that is not loaded from shader!"),
-    )
-    .expect("Failed to attach vbo to vao!");
+    a.attach_bound_vbo_to_bound_vao(&tex_vbo, program.get_attribute_id("tex_coord"))
+        .expect("Failed to attach vbo to vao!");
 
     a.bind_vao_for_program(&program).expect("Shader is asking for more values than vao has attached, all attributes the shader uses must be attached to vao!");
 
