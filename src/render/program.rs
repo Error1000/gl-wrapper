@@ -146,23 +146,23 @@ impl Program {
         }
     }
 
-    pub fn set_vec3_f32(self: &mut Self, id: GLint, val: &[f32; 3]) {
+    pub fn set_vec3_f32(self: &mut Self, id: GLint, val: [f32; 3]) {
         unsafe {
             gl::Uniform3fv(id, 1, val.as_ptr());
         }
     }
-    pub fn set_vec3_i32(self: &mut Self, id: GLint, val: &[i32; 3]) {
+    pub fn set_vec3_i32(self: &mut Self, id: GLint, val: [i32; 3]) {
         unsafe {
             gl::Uniform3iv(id, 1, val.as_ptr());
         }
     }
-    pub fn set_vec3_u32(self: &mut Self, id: GLint, val: &[u32; 3]) {
+    pub fn set_vec3_u32(self: &mut Self, id: GLint, val: [u32; 3]) {
         unsafe {
             gl::Uniform3uiv(id, 1, val.as_ptr());
         }
     }
 
-    pub fn set_vec2_f32(self: &mut Self, id: GLint, val: &[f32; 2]) {
+    pub fn set_vec2_f32(self: &mut Self, id: GLint, val: [f32; 2]) {
         unsafe {
             gl::Uniform2fv(id, 1, val.as_ptr());
         }

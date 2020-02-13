@@ -72,10 +72,10 @@ pub fn texture_bits_to_opengl_types(bpc: u8, cpp: u8) -> Option<(GLint, GLenum)>
 
         _ => return None,
     };
-    return Some((
+    Some((
         internal_format
             .try_into()
             .expect("FATAL Failure, faulty opengl implementation!"),
         format,
-    ));
+    ))
 }
