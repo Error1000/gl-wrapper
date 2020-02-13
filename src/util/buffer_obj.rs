@@ -58,9 +58,8 @@ impl<ET> VBO<ET> {
         self.get_size() / isize::from(self.get_elem_per_vertex())
     }
 
-    // TODO: Consider renaming this
     pub fn upload_to_bound_bo(self: &mut Self, data: &[ET], usage: GLenum) -> Option<()> {
-        self.0.size = match data.len().try_into() {
+        self.0.size = match isize::try_from(data.len()) {
             Ok(val) => val,
             Err(_) => return None,
         };
@@ -92,7 +91,6 @@ impl<ET> IBO<ET> {
         Some(r)
     }
 
-    // TODO: Consider renaming this
     pub fn upload_to_bound_bo(self: &mut Self, data: &[ET], usage: GLenum) -> Option<()> {
         self.0.size = match isize::try_from(data.len()) {
             Ok(val) => val,

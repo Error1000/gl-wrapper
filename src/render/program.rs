@@ -78,8 +78,9 @@ impl Program {
             gl::UseProgram(self.id);
         }
     }
+
     // General loader of values (private)
-    /// TODO: Should probablly get rid of always but i know this function is only used in like 2 spots and there is no real reason not to inline it
+    /// TODO: Should probably get rid of inline(always) but i know this function is only used in like 2 spots and there is no real reason not to inline it
     #[inline(always)]
     fn get_id_of(
         self: &Self,

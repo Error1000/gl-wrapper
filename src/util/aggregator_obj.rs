@@ -11,7 +11,6 @@ pub struct VAO {
 }
 
 impl Drop for VAO {
-    /// TODO: Make sure the VAO actually gets dropped
     fn drop(self: &mut Self) {
         unsafe {
             gl::DeleteVertexArrays(1, &(self.id));

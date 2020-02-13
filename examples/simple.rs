@@ -21,6 +21,7 @@ use glutin::event_loop::{ControlFlow, EventLoop};
 use glutin::window::WindowBuilder;
 
 use std::path::Path;
+use glutin::platform::desktop::EventLoopExtDesktop;
 
 // Vertex data
 static VERTEX_DATA: [GLfloat; 8] = [-1.0, 1.0, 1.0, 1.0, 1.0, -1.0, -1.0, -1.0];
@@ -52,7 +53,7 @@ void main() {
 }";
 
 fn main() {
-    let events_loop = EventLoop::new();
+    let mut events_loop = EventLoop::new();
     let window = WindowBuilder::new()
         .with_inner_size(PhysicalSize {
             width: 400.0,
@@ -159,9 +160,10 @@ fn main() {
         gl::DrawElements(gl::TRIANGLES, ibo_len, ibo_enum_type, ptr::null());
     };
 
-    events_loop.run(move |event, _, control_flow| {
+    // Note we use run-return to make sure that everything gets dropped ( although run also works )
+    events_loop.run_return(|event, _, control_flow| {
         // Unless we re write the control flow just wait until another evetn arrives when this iteration finished
-        *control_flow = ControlFlow::Wait;
+        *control_flow = ControlFlow::Poll;
         match event {
             // Window stuff
             Event::WindowEvent { event, .. } => {
