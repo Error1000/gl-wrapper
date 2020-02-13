@@ -6,12 +6,14 @@ use std::ptr;
 use std::str;
 
 pub struct ShaderBase {
-    id: GLuint
+    id: GLuint,
 }
 
 impl Drop for ShaderBase {
     fn drop(self: &mut Self) {
-        unsafe { gl::DeleteShader(self.id); }
+        unsafe {
+            gl::DeleteShader(self.id);
+        }
     }
 }
 
@@ -20,13 +22,13 @@ impl ShaderBase {
     /// NOTE: Just in general shader compilation is slow so use new only when you need to
     pub fn new(src: &str, sh_type: GLenum) -> Result<Self, String> {
         let r = ShaderBase {
-                id: unsafe{ gl::CreateShader(sh_type) },
+            id: unsafe { gl::CreateShader(sh_type) },
         };
         unsafe {
             {
-                let csrc = match CString::new(src.as_bytes()){
+                let csrc = match CString::new(src.as_bytes()) {
                     Ok(val) => val,
-                    Err(_) => return Err(String::from("Failed to convert string to CString!"))
+                    Err(_) => return Err(String::from("Failed to convert string to CString!")),
                 };
                 gl::ShaderSource(r.id, 1, &csrc.as_ptr(), ptr::null());
             }
@@ -45,12 +47,7 @@ impl ShaderBase {
 			    };
                 let mut buf = Vec::<u8>::with_capacity(new_len);
                 buf.set_len(new_len - 1); // subtract 1 to skip the trailing null character
-                gl::GetShaderInfoLog(
-                    r.id,
-                    len,
-                    ptr::null_mut(),
-                    buf.as_mut_ptr() as *mut GLchar,
-                );
+                gl::GetShaderInfoLog(r.id, len, ptr::null_mut(), buf.as_mut_ptr() as *mut GLchar);
 
                 return match str::from_utf8(&buf) {
                     Ok(msg) => {
@@ -62,25 +59,22 @@ impl ShaderBase {
                             + &String::from("In shader of type: ")
                             + &t
                             + &String::from("!\n"))
-                    },
+                    }
 
-                    Err(std::str::Utf8Error { .. }) =>
+                    Err(std::str::Utf8Error { .. }) => {
                         Err(String::from("ShaderInfoLog not a valid utf8 string!"))
+                    }
                 };
-
             }
         }
         Ok(r)
     }
 
-   // NEEDED BY Program
-   pub(crate) fn get_id(self: &Self) -> GLuint {
-       self.id.clone() // make sure we don't give up our id ( i know this si redundant )
-   }
+    // NEEDED BY Program
+    pub(crate) fn get_id(self: &Self) -> GLuint {
+        self.id.clone() // make sure we don't give up our id ( i know this si redundant )
+    }
 }
-
-
-
 
 pub struct VertexShader(ShaderBase);
 pub struct FragmentShader(ShaderBase);
@@ -91,12 +85,16 @@ impl VertexShader {
         Ok(VertexShader(ShaderBase::new(src, gl::VERTEX_SHADER)?))
     }
 
-    pub fn get_shader_base(self: &Self) -> &ShaderBase { &self.0 }
+    pub fn get_shader_base(self: &Self) -> &ShaderBase {
+        &self.0
+    }
 }
 
-impl Into<ShaderBase> for VertexShader{
+impl Into<ShaderBase> for VertexShader {
     // Consume VertexShader and pass ownership of it's only value as output
-    fn into(self: Self) -> ShaderBase{ self.0 }
+    fn into(self: Self) -> ShaderBase {
+        self.0
+    }
 }
 
 impl FragmentShader {
@@ -104,10 +102,14 @@ impl FragmentShader {
     pub fn new(src: &str) -> Result<Self, String> {
         Ok(FragmentShader(ShaderBase::new(src, gl::FRAGMENT_SHADER)?))
     }
-    pub fn get_shader_base(self: &Self) -> &ShaderBase { &self.0 }
+    pub fn get_shader_base(self: &Self) -> &ShaderBase {
+        &self.0
+    }
 }
 
-impl Into<ShaderBase> for FragmentShader{
+impl Into<ShaderBase> for FragmentShader {
     // Consume VertexShader and pass ownership of it's only value as output
-    fn into(self: Self) -> ShaderBase{ self.0 }
+    fn into(self: Self) -> ShaderBase {
+        self.0
+    }
 }

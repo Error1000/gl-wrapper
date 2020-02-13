@@ -1,19 +1,21 @@
 use gl::types::*;
 use std::ptr;
 
-use crate::util::buffer_obj;
 use crate::api;
 use crate::render::program;
+use crate::util::buffer_obj;
 
 pub struct VAO {
     id: GLuint,
-    available_ind: Vec<GLuint>
+    available_ind: Vec<GLuint>,
 }
 
 impl Drop for VAO {
     /// TODO: Make sure the VAO actually gets dropped
     fn drop(self: &mut Self) {
-        unsafe { gl::DeleteVertexArrays(1, &(self.id)); }
+        unsafe {
+            gl::DeleteVertexArrays(1, &(self.id));
+        }
     }
 }
 
@@ -21,24 +23,32 @@ impl VAO {
     pub fn new() -> Self {
         let mut r = VAO {
             id: 0,
-            available_ind: Vec::new()
+            available_ind: Vec::new(),
         };
-        unsafe { gl::GenVertexArrays(1, &mut (r.id)); }
+        unsafe {
+            gl::GenVertexArrays(1, &mut (r.id));
+        }
         r
     }
 
-    pub fn bind_vao_for_data(self: &mut Self){
-        unsafe { gl::BindVertexArray(self.id); }
+    pub fn bind_vao_for_data(self: &mut Self) {
+        unsafe {
+            gl::BindVertexArray(self.id);
+        }
     }
 
     /// TODO: Optimise this maybe
-    pub fn bind_vao_for_program(self: &mut Self, p: &program::Program) -> Option<()>{
+    pub fn bind_vao_for_program(self: &mut Self, p: &program::Program) -> Option<()> {
         self.bind_vao_for_data();
-        for (_, l) in p.get_attribute_hashmap(){
+        for (_, l) in p.get_attribute_hashmap() {
             // If the data index the program needs has not been attached throw error so it is
             // impossible to cause undefined behaviour
-            if !self.available_ind.contains(&l){ return None; }
-            unsafe{ gl::EnableVertexAttribArray(*l); }
+            if !self.available_ind.contains(&l) {
+                return None;
+            }
+            unsafe {
+                gl::EnableVertexAttribArray(*l);
+            }
         }
         Some(())
     }
@@ -67,5 +77,4 @@ impl VAO {
         self.available_ind.push(index);
         Ok(())
     }
-
 }
