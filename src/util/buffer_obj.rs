@@ -1,5 +1,5 @@
 use gl::types::*;
-use std::convert::TryInto;
+use std::convert::{TryInto, TryFrom};
 use std::marker::PhantomData;
 use std::mem::size_of;
 
@@ -48,23 +48,18 @@ impl<ET> VBO<ET> {
 
     pub fn get_elem_per_vertex(self: &Self) -> u8 { self.1 }
 
-    // NOTE: This dosen't just return a value it uses two values already in the struct to get this value so it's not as lightwieght as other getters
+    // NOTE: This dosen't just return a value it uses two values already in the struct to get this value so it's not as lightweight as other getters
     pub fn get_num_of_vertices(self: &Self) -> isize {
-        self.get_size() / (self.get_elem_per_vertex() as isize)
+        self.get_size() / isize::from(self.get_elem_per_vertex())
     }
 
     // TODO: Consider renaming this
     pub fn upload_to_bound_bo(self: &mut Self, data: &[ET], usage: GLenum) -> Option<()>{
-        if size_of::<ET>() > std::isize::MAX as usize { return None; }
-        if data.len() > std::isize::MAX as usize { return None; }
-        self.0.size = match data.len().try_into() {
-            Ok(val) => val,
-            Err(_) => return None,
-        };
+        self.0.size = match data.len().try_into() { Ok(val) => val, Err(_) => return None };
         unsafe {
             gl::BufferData(
                 Self::get_type(),
-                self.get_size() * (size_of::<ET>() as isize),
+                self.get_size() * match isize::try_from(size_of::<ET>()){ Ok(v) => v, Err(_) => return None },
                 &data[0] as *const ET as *const std::ffi::c_void,
                 usage,
             );
@@ -87,16 +82,11 @@ impl<ET> IBO<ET> {
 
     // TODO: Consider renaming this
     pub fn upload_to_bound_bo(self: &mut Self, data: &[ET], usage: GLenum) -> Option<()>{
-        if size_of::<ET>() > std::isize::MAX as usize { return None; }
-        if data.len() > std::isize::MAX as usize { return None; }
-        self.0.size = match data.len().try_into() {
-            Ok(val) => val,
-            Err(_) => return None,
-        };
+        self.0.size = match isize::try_from(data.len()) { Ok(val) => val, Err(_) => return None, };
         unsafe {
             gl::BufferData(
                 Self::get_type(),
-                self.get_size() * (size_of::<ET>() as isize),
+                self.get_size() * match isize::try_from(size_of::<ET>()){ Ok(v) => v, Err(_) => return None},
                 &data[0] as *const ET as *const std::ffi::c_void,
                 usage,
             );

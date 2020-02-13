@@ -37,7 +37,7 @@ impl VAO {
         for (_, l) in p.get_attribute_hashmap(){
             // If the data index the program needs has not been attached throw error so it is
             // impossible to cause undefined behaviour
-            if !self.available_ind.contains(l){ return None; }
+            if !self.available_ind.contains(&l){ return None; }
             unsafe{ gl::EnableVertexAttribArray(*l); }
         }
         Some(())

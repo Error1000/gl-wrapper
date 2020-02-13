@@ -75,8 +75,9 @@ impl Program {
     pub fn bind_program(self: &Self) {
         unsafe { gl::UseProgram(self.id); }
     }
-    // General loader of values
-    #[inline]
+    // General loader of values (private)
+    /// TODO: Should probablly get rid of always but i know this function is only used in like 2 spots and there is no real reason not to inline it
+    #[inline(always)]
     fn get_id_of(self: &Self, name: &'static str, get_location: unsafe fn(GLuint, *const GLchar) -> GLint) -> Option<u32>{
         let id = {
             let cname = match CString::new(name.as_bytes()){
@@ -131,32 +132,32 @@ impl Program {
     }
 
     pub fn set_vec3_f32(self: &mut Self, id: GLint, val: &[f32; 3]){
-        unsafe{ gl::Uniform3fv(id, 1, val as *const f32); }
+        unsafe{ gl::Uniform3fv(id, 1, val.as_ptr()); }
     }
     pub fn set_vec3_i32(self: &mut Self, id: GLint, val: &[i32; 3]){
-        unsafe{ gl::Uniform3iv(id, 1, val as *const i32); }
+        unsafe{ gl::Uniform3iv(id, 1, val.as_ptr()); }
     }
     pub fn set_vec3_u32(self: &mut Self, id: GLint, val: &[u32; 3]){
-        unsafe{ gl::Uniform3uiv(id, 1, val as *const u32); }
+        unsafe{ gl::Uniform3uiv(id, 1, val.as_ptr()); }
     }
 
 
     pub fn set_vec2_f32(self: &mut Self, id: GLint, val: &[f32; 2]){
-        unsafe{ gl::Uniform2fv(id, 1, val as *const f32); }
+        unsafe{ gl::Uniform2fv(id, 1, val.as_ptr()); }
     }
     pub fn set_vec2_i32(self: &mut Self, id: GLint, val: &[i32; 2]){
-        unsafe{ gl::Uniform2iv(id, 1, val as *const i32); }
+        unsafe{ gl::Uniform2iv(id, 1, val.as_ptr()); }
     }
     pub fn set_vec2_u32(self: &mut Self, id: GLint, val: &[u32; 2]){
-        unsafe{ gl::Uniform2uiv(id, 1, val as *const u32); }
+        unsafe{ gl::Uniform2uiv(id, 1, val.as_ptr()); }
     }
 
     pub fn set_uniform_mat3(self: &mut Self, id: GLint, val: &[f32; 3*3]){
-        unsafe{ gl::UniformMatrix3fv(id, 1, gl::FALSE, val as *const f32); }
+        unsafe{ gl::UniformMatrix3fv(id, 1, gl::FALSE, val.as_ptr()); }
     }
 
     pub fn set_uniform_mat4(self: &mut Self, id: GLint, val: &[f32; 4*4]){
-        unsafe{ gl::UniformMatrix4fv(id, 1, gl::FALSE, val as *const f32); }
+        unsafe{ gl::UniformMatrix4fv(id, 1, gl::FALSE, val.as_ptr()); }
     }
 
     pub fn get_uniform_id(self: &Self, name: &'static str) -> Option<GLuint> {

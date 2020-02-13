@@ -75,7 +75,7 @@ impl ShaderBase {
 
    // NEEDED BY Program
    pub(crate) fn get_id(self: &Self) -> GLuint {
-       self.id
+       self.id.clone() // make sure we don't give up our id ( i know this si redundant )
    }
 }
 

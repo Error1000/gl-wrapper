@@ -93,10 +93,7 @@ impl Texture2D{
 
     /// CPP = channels per pixel ( examples: RGBA = 4 channels, RGB = 3 channels, RG = 2 channels, R = 1 channel, ... )
     pub fn upload_data_to_bound_texture<ET: 'static>(self: &mut Self, size: [GLint; 2], data: &[ET], cpp: u8)-> Option<()>{
-        let l: i32 = match data.len().try_into(){
-            Ok(v) => v,
-            Err(_) => return None,
-        };
+        let l: i32 = match data.len().try_into(){ Ok(v) => v, Err(_) => return None };
         if size[0] * size[1] * i32::from(cpp) != l { return None; }
         let (internal_fmt, fmt) = api::texture_bits_to_opengl_types((std::mem::size_of::<ET>()*8).try_into().unwrap(), cpp)?;
         unsafe{
@@ -113,10 +110,7 @@ impl Texture2DArray{
 
     /// CPP = channels per pixel ( examples: RGBA = 4 channels, RGB = 3 channels, RG = 2 channels, R = 1 channel, ... )
     pub fn upload_data_to_bound_texture<ET: 'static>(self: &mut Self, size: [GLint; 3], data: &[ET], cpp: u8)-> Option<()>{
-        let l: i32 = match data.len().try_into(){
-            Ok(v) => v,
-            Err(_) => return None,
-        };
+        let l: i32 = match data.len().try_into(){ Ok(v) => v, Err(_) => return None };
         if size[0] * size[1] * size[2] * i32::from(cpp) != l { return None; }
         let (internal_fmt, fmt) = api::texture_bits_to_opengl_types((std::mem::size_of::<ET>()*8).try_into().unwrap(), cpp)?;
         unsafe{
