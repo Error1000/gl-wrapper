@@ -38,7 +38,6 @@ impl TextureBase {
         }
         r
     }
-
 }
 
 pub trait TextureFunc {
@@ -105,12 +104,12 @@ impl Texture2D {
         self: &mut Self,
         size: [u32; 2],
         data: &[ET],
-        format: GLenum
+        format: GLenum,
     ) -> Option<()> {
         let l: u32 = unwrap_or_ret_none!(data.len().try_into());
         let (internal_fmt, cpp) = crate::format_to_gl_internal_format(
             (std::mem::size_of::<ET>() * 8).try_into().unwrap(),
-            format
+            format,
         )?;
         if size[0] * size[1] * u32::from(cpp) != l {
             return None;
@@ -141,12 +140,12 @@ impl Texture2DArray {
         self: &mut Self,
         size: [u32; 3],
         data: &[ET],
-        format: GLenum
+        format: GLenum,
     ) -> Option<()> {
         let l: u32 = unwrap_or_ret_none!(data.len().try_into());
         let (internal_fmt, cpp) = crate::format_to_gl_internal_format(
             (std::mem::size_of::<ET>() * 8).try_into().unwrap(),
-            format
+            format,
         )?;
         if size[0] * size[1] * size[2] * u32::from(cpp) != l {
             return None;
@@ -178,12 +177,12 @@ impl Texture3D {
         self: &mut Self,
         size: [u32; 3],
         data: &[ET],
-        format: GLenum
+        format: GLenum,
     ) -> Option<()> {
         let l: u32 = unwrap_or_ret_none!(data.len().try_into());
         let (internal_fmt, cpp) = crate::format_to_gl_internal_format(
             (std::mem::size_of::<ET>() * 8).try_into().unwrap(),
-            format
+            format,
         )?;
         if size[0] * size[1] * size[2] * u32::from(cpp) != l {
             return None;

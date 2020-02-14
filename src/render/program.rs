@@ -217,10 +217,14 @@ impl Program {
     /// I know unsafe is not a good idea but the code bloat is pretty big plus the only error that these functions can cause is either because memory corruption or bad usage of the api that could lead to undefined behaviour plus if the user really wants they can catch the unwrap soo, i'm sorry
 
     #[inline]
-    pub fn get_uniform_id(self: &Self, name: &'static str) -> GLuint { *self.uniform_ids.get(name).unwrap() }
+    pub fn get_uniform_id(self: &Self, name: &'static str) -> GLuint {
+        *self.uniform_ids.get(name).unwrap()
+    }
 
     #[inline]
-    pub fn get_attribute_id(self: &Self, name: &'static str) -> GLuint { *self.attrib_ids.get(name).unwrap() }
+    pub fn get_attribute_id(self: &Self, name: &'static str) -> GLuint {
+        *self.attrib_ids.get(name).unwrap()
+    }
 
     #[inline]
     pub fn get_sampler_id(self: &Self, name: &'static str) -> GLuint {

@@ -101,7 +101,7 @@ pub fn init(win: WindowedContext<NotCurrent>) -> Option<WindowedContext<Possibly
 
 #[inline]
 pub fn format_to_gl_internal_format(bpc: u8, format: GLenum) -> Option<(GLint, u8)> {
-    let cpp: u8 = match format{
+    let cpp: u8 = match format {
         gl::RED => 1,
         gl::RG => 2,
         gl::RGB => 3,
@@ -128,5 +128,10 @@ pub fn format_to_gl_internal_format(bpc: u8, format: GLenum) -> Option<(GLint, u
 
         _ => return None,
     };
-    Some((internal_format.try_into().expect("FATAL Failure, faulty opengl implementation!"), cpp))
+    Some((
+        internal_format
+            .try_into()
+            .expect("FATAL Failure, faulty opengl implementation!"),
+        cpp,
+    ))
 }
