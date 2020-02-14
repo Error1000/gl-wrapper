@@ -63,12 +63,11 @@ fn main() {
         .with_vsync(true)
         .build_windowed(window, &events_loop)
         .expect("Failed to create window!");
-    let gl_window = unsafe { gl_window.make_current() }.unwrap();
 
     // Load the OpenGL function pointers
-    gl_wrapper::init(&gl_window);
-    println!("Window created but hidden!");
+    let gl_window = gl_wrapper::init(gl_window).expect("Couldn't acquire gl context!");
 
+    println!("Window created but hidden!");
     println!("OpenGL Version: {}", gl_wrapper::get_gl_version_str());
 
     // Create GLSL shaders

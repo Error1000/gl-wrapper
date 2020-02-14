@@ -1,7 +1,6 @@
 use gl::types::*;
-use glutin::window::Window;
-use glutin::ContextWrapper;
 use glutin::PossiblyCurrent;
+use glutin::{NotCurrent, WindowedContext};
 use std::any::TypeId;
 use std::convert::TryInto;
 use std::ffi::CStr;
@@ -87,7 +86,8 @@ pub fn shader_glenum_to_string(e: GLenum) -> Option<&'static str> {
     }
 }
 
-pub fn init(w: &ContextWrapper<PossiblyCurrent, Window>) {
+pub fn init(win: WindowedContext<NotCurrent>) -> Option<WindowedContext<PossiblyCurrent>> {
+    let w = unwrap_or_ret_none!(unsafe { win.make_current() });
     gl::load_with(|symbol| w.get_proc_address(symbol));
     unsafe {
         gl::Enable(gl::BLEND);
@@ -95,6 +95,7 @@ pub fn init(w: &ContextWrapper<PossiblyCurrent, Window>) {
 
         gl::PixelStorei(gl::UNPACK_ALIGNMENT, 1);
         gl::PixelStorei(gl::PACK_ALIGNMENT, 1);
+        Some(w)
     }
 }
 
