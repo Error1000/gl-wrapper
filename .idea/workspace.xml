@@ -6,8 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="efb3930f-a966-48e8-a961-4513db482a27" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/examples/simple.rs" beforeDir="false" afterPath="$PROJECT_DIR$/examples/simple.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/render/texture.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/render/texture.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -37,7 +35,7 @@
   <component name="PropertiesComponent">
     <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../gl-puck" />
     <property name="org.rust.cargo.project.model.PROJECT_DISCOVERY" value="true" />
     <property name="org.rust.hideDetachedFileNotifications/home/dan/Documents/Coding/Rust/OpenGLWrapper/src/util/mod.rs" value="true" />
     <property name="org.rust.hideDetachedFileNotifications/home/dan/Documents/Coding/Rust/gl-wrapper/src/API.rs" value="true" />
@@ -201,7 +199,14 @@
       <option name="project" value="LOCAL" />
       <updated>1581703311881</updated>
     </task>
-    <option name="localTasksCounter" value="18" />
+    <task id="LOCAL-00018" summary="test">
+      <created>1581709220336</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1581709220336</updated>
+    </task>
+    <option name="localTasksCounter" value="19" />
     <servers />
   </component>
   <component name="UnknownFeatures">
@@ -229,7 +234,8 @@
     <MESSAGE value="update todo" />
     <MESSAGE value="small update" />
     <MESSAGE value="change a few internals of texture.rs" />
-    <option name="LAST_COMMIT_MESSAGE" value="change a few internals of texture.rs" />
+    <MESSAGE value="test" />
+    <option name="LAST_COMMIT_MESSAGE" value="test" />
   </component>
   <component name="WindowStateProjectService">
     <state x="555" y="188" width="804" height="677" key="#Project_Structure" timestamp="1581179757411">
@@ -244,38 +250,38 @@
       <screen x="0" y="0" width="1920" height="1051" />
     </state>
     <state x="213" y="275" width="528" height="501" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1920.1051@0.0.1920.1051" timestamp="1581692414790" />
-    <state x="95" y="123" width="764" height="805" key="CommitChangelistDialog2" timestamp="1581703311692">
+    <state x="95" y="123" width="764" height="805" key="CommitChangelistDialog2" timestamp="1581709220131">
       <screen x="0" y="0" width="1920" height="1051" />
     </state>
-    <state x="95" y="123" width="764" height="805" key="CommitChangelistDialog2/0.0.1920.1051@0.0.1920.1051" timestamp="1581703311692" />
-    <state x="743" y="284" width="428" height="484" key="FileChooserDialogImpl" timestamp="1581703326935">
+    <state x="95" y="123" width="764" height="805" key="CommitChangelistDialog2/0.0.1920.1051@0.0.1920.1051" timestamp="1581709220131" />
+    <state x="743" y="284" width="428" height="484" key="FileChooserDialogImpl" timestamp="1581709235574">
       <screen x="0" y="0" width="1920" height="1051" />
     </state>
-    <state x="743" y="284" width="428" height="484" key="FileChooserDialogImpl/0.0.1920.1051@0.0.1920.1051" timestamp="1581703326935" />
-    <state width="1878" height="277" key="GridCell.Tab.0.bottom" timestamp="1581703326956">
+    <state x="743" y="284" width="428" height="484" key="FileChooserDialogImpl/0.0.1920.1051@0.0.1920.1051" timestamp="1581709235574" />
+    <state width="914" height="276" key="GridCell.Tab.0.bottom" timestamp="1581709235593">
       <screen x="0" y="0" width="1920" height="1051" />
     </state>
-    <state width="1878" height="277" key="GridCell.Tab.0.bottom/0.0.1920.1051@0.0.1920.1051" timestamp="1581703326956" />
-    <state width="1878" height="277" key="GridCell.Tab.0.center" timestamp="1581703326956">
+    <state width="914" height="276" key="GridCell.Tab.0.bottom/0.0.1920.1051@0.0.1920.1051" timestamp="1581709235593" />
+    <state width="914" height="276" key="GridCell.Tab.0.center" timestamp="1581709235593">
       <screen x="0" y="0" width="1920" height="1051" />
     </state>
-    <state width="1878" height="277" key="GridCell.Tab.0.center/0.0.1920.1051@0.0.1920.1051" timestamp="1581703326956" />
-    <state width="1878" height="277" key="GridCell.Tab.0.left" timestamp="1581703326956">
+    <state width="914" height="276" key="GridCell.Tab.0.center/0.0.1920.1051@0.0.1920.1051" timestamp="1581709235593" />
+    <state width="914" height="276" key="GridCell.Tab.0.left" timestamp="1581709235592">
       <screen x="0" y="0" width="1920" height="1051" />
     </state>
-    <state width="1878" height="277" key="GridCell.Tab.0.left/0.0.1920.1051@0.0.1920.1051" timestamp="1581703326956" />
-    <state width="1878" height="277" key="GridCell.Tab.0.right" timestamp="1581703326956">
+    <state width="914" height="276" key="GridCell.Tab.0.left/0.0.1920.1051@0.0.1920.1051" timestamp="1581709235592" />
+    <state width="914" height="276" key="GridCell.Tab.0.right" timestamp="1581709235593">
       <screen x="0" y="0" width="1920" height="1051" />
     </state>
-    <state width="1878" height="277" key="GridCell.Tab.0.right/0.0.1920.1051@0.0.1920.1051" timestamp="1581703326956" />
+    <state width="914" height="276" key="GridCell.Tab.0.right/0.0.1920.1051@0.0.1920.1051" timestamp="1581709235593" />
     <state x="506" y="151" key="SettingsEditor" timestamp="1581243076011">
       <screen x="0" y="0" width="1920" height="1051" />
     </state>
     <state x="506" y="151" key="SettingsEditor/0.0.1920.1051@0.0.1920.1051" timestamp="1581243076011" />
-    <state x="75" y="261" width="804" height="528" key="Vcs.Push.Dialog.v2" timestamp="1581703315534">
+    <state x="75" y="261" width="804" height="528" key="Vcs.Push.Dialog.v2" timestamp="1581709224905">
       <screen x="0" y="0" width="1920" height="1051" />
     </state>
-    <state x="75" y="261" width="804" height="528" key="Vcs.Push.Dialog.v2/0.0.1920.1051@0.0.1920.1051" timestamp="1581703315534" />
+    <state x="75" y="261" width="804" height="528" key="Vcs.Push.Dialog.v2/0.0.1920.1051@0.0.1920.1051" timestamp="1581709224905" />
     <state x="221" y="262" width="505" height="526" key="com.intellij.openapi.vcs.changes.SpecificFilesViewDialog" timestamp="1581250750149">
       <screen x="0" y="0" width="1920" height="1051" />
     </state>

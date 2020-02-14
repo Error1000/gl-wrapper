@@ -43,6 +43,7 @@ impl TextureBase {
 pub trait TextureFunc {
     fn bind_texture(self: &Self, sampler_id: GLuint) {
         unsafe {
+            gl::ActiveTexture(gl::TEXTURE0);
             gl::BindTexture(Self::get_type(), self.get_tex_base().id);
             gl::ActiveTexture(gl::TEXTURE0 + sampler_id);
         }
