@@ -100,38 +100,33 @@ pub fn init(win: WindowedContext<NotCurrent>) -> Option<WindowedContext<Possibly
 }
 
 #[inline]
-pub fn texture_bits_to_gl_types(bpc: u8, cpp: u8) -> Option<(GLint, GLenum)> {
-    let format = match cpp {
-        1 => gl::RED,
-        2 => gl::RG,
-        3 => gl::RGB,
-        4 => gl::RGBA,
+pub fn format_to_gl_internal_format(bpc: u8, format: GLenum) -> Option<(GLint, u8)> {
+    let cpp: u8 = match format{
+        gl::RED => 1,
+        gl::RG => 2,
+        gl::RGB => 3,
+        gl::RGBA => 4,
         _ => return None,
     };
 
     let internal_format = match bpc {
-        8 => match cpp {
-            1 => gl::R8,
-            2 => gl::RG8,
-            3 => gl::RGB8,
-            4 => gl::RGBA8,
+        8 => match format {
+            gl::RED => gl::R8,
+            gl::RG => gl::RG8,
+            gl::RGB => gl::RGB8,
+            gl::RGBA => gl::RGBA8,
             _ => return None,
         },
 
-        16 => match cpp {
-            1 => gl::R16,
-            2 => gl::RG16,
-            3 => gl::RGB16,
-            4 => gl::RGBA16,
+        16 => match format {
+            gl::RED => gl::R16,
+            gl::RG => gl::RG16,
+            gl::RGB => gl::RGB16,
+            gl::RGBA => gl::RGBA16,
             _ => return None,
         },
 
         _ => return None,
     };
-    Some((
-        internal_format
-            .try_into()
-            .expect("FATAL Failure, faulty opengl implementation!"),
-        format,
-    ))
+    Some((internal_format.try_into().expect("FATAL Failure, faulty opengl implementation!"), cpp))
 }

@@ -104,7 +104,7 @@ fn main() {
         t.upload_data_to_bound_texture(
             [im.width(), im.height()],
             im.as_ref(),
-            4, /* RGBA has 4 channel per pixel*/
+            gl::RGBA
         )
         .expect("Failed to upload texture data to gpu ( are you sure the texture is valid? ) !");
         t.bind_texture_for_sampling(program.get_sampler_id("obj_tex"));

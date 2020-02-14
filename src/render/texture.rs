@@ -1,6 +1,6 @@
 use crate::unwrap_or_ret_none;
 use gl::types::*;
-use std::convert::{TryFrom, TryInto};
+use std::convert::TryInto;
 
 pub struct TextureBase {
     id: GLuint,
@@ -15,7 +15,7 @@ impl Drop for TextureBase {
 }
 
 impl TextureBase {
-    fn new(typ: GLenum) -> Self {
+    pub fn new(typ: GLenum) -> Self {
         let mut r = TextureBase { id: 0 };
         unsafe {
             gl::GenTextures(1, &mut r.id);
@@ -38,6 +38,7 @@ impl TextureBase {
         }
         r
     }
+
 }
 
 pub trait TextureFunc {
@@ -93,26 +94,27 @@ pub struct Texture2D(TextureBase);
 pub struct Texture2DArray(TextureBase);
 pub struct Texture3D(TextureBase);
 
+// IMPORTANT TODO: Add template to auto implement upload_data
+
 impl Texture2D {
     pub fn new() -> Self {
         Self(TextureBase::new(Self::get_type()))
     }
 
-    /// CPP = channels per pixel ( examples: RGBA = 4 channels, RGB = 3 channels, RG = 2 channels, R = 1 channel, ... )
     pub fn upload_data_to_bound_texture<ET: 'static>(
         self: &mut Self,
         size: [u32; 2],
         data: &[ET],
-        cpp: u8,
+        format: GLenum
     ) -> Option<()> {
-        let l = unwrap_or_ret_none!(u32::try_from(data.len()));
+        let l: u32 = unwrap_or_ret_none!(data.len().try_into());
+        let (internal_fmt, cpp) = crate::format_to_gl_internal_format(
+            (std::mem::size_of::<ET>() * 8).try_into().unwrap(),
+            format
+        )?;
         if size[0] * size[1] * u32::from(cpp) != l {
             return None;
         }
-        let (internal_fmt, fmt) = crate::texture_bits_to_gl_types(
-            (std::mem::size_of::<ET>() * 8).try_into().unwrap(),
-            cpp,
-        )?;
         unsafe {
             gl::TexImage2D(
                 Self::get_type(),
@@ -121,7 +123,7 @@ impl Texture2D {
                 unwrap_or_ret_none!(size[0].try_into()),
                 unwrap_or_ret_none!(size[1].try_into()),
                 0,
-                fmt,
+                format,
                 crate::type_to_gl_enum::<ET>()?,
                 &data[0] as *const ET as *const std::ffi::c_void,
             );
@@ -135,31 +137,30 @@ impl Texture2DArray {
         Self(TextureBase::new(Self::get_type()))
     }
 
-    /// CPP = channels per pixel ( examples: RGBA = 4 channels, RGB = 3 channels, RG = 2 channels, R = 1 channel, ... )
     pub fn upload_data_to_bound_texture<ET: 'static>(
         self: &mut Self,
-        size: [GLint; 3],
+        size: [u32; 3],
         data: &[ET],
-        cpp: u8,
+        format: GLenum
     ) -> Option<()> {
-        let l: i32 = unwrap_or_ret_none!(data.len().try_into());
-        if size[0] * size[1] * size[2] * i32::from(cpp) != l {
+        let l: u32 = unwrap_or_ret_none!(data.len().try_into());
+        let (internal_fmt, cpp) = crate::format_to_gl_internal_format(
+            (std::mem::size_of::<ET>() * 8).try_into().unwrap(),
+            format
+        )?;
+        if size[0] * size[1] * size[2] * u32::from(cpp) != l {
             return None;
         }
-        let (internal_fmt, fmt) = crate::texture_bits_to_gl_types(
-            (std::mem::size_of::<ET>() * 8).try_into().unwrap(),
-            cpp,
-        )?;
         unsafe {
             gl::TexImage3D(
                 Self::get_type(),
                 0,
                 internal_fmt,
-                size[0],
-                size[1],
-                size[2],
+                unwrap_or_ret_none!(size[0].try_into()),
+                unwrap_or_ret_none!(size[1].try_into()),
+                unwrap_or_ret_none!(size[2].try_into()),
                 0,
-                fmt,
+                format,
                 crate::type_to_gl_enum::<ET>()?,
                 &data[0] as *const ET as *const std::ffi::c_void,
             );
@@ -173,31 +174,30 @@ impl Texture3D {
         Self(TextureBase::new(Self::get_type()))
     }
 
-    /// CPP = channels per pixel ( examples: RGBA = 4 channels, RGB = 3 channels, RG = 2 channels, R = 1 channel, ... )
     pub fn upload_data_to_bound_texture<ET: 'static>(
         self: &mut Self,
-        size: [GLint; 3],
+        size: [u32; 3],
         data: &[ET],
-        cpp: u8,
+        format: GLenum
     ) -> Option<()> {
-        let l: i32 = unwrap_or_ret_none!(data.len().try_into());
-        if size[0] * size[1] * size[2] * i32::from(cpp) != l {
+        let l: u32 = unwrap_or_ret_none!(data.len().try_into());
+        let (internal_fmt, cpp) = crate::format_to_gl_internal_format(
+            (std::mem::size_of::<ET>() * 8).try_into().unwrap(),
+            format
+        )?;
+        if size[0] * size[1] * size[2] * u32::from(cpp) != l {
             return None;
         }
-        let (internal_fmt, fmt) = crate::texture_bits_to_gl_types(
-            (std::mem::size_of::<ET>() * 8).try_into().unwrap(),
-            cpp,
-        )?;
         unsafe {
             gl::TexImage3D(
                 Self::get_type(),
                 0,
                 internal_fmt,
-                size[0],
-                size[1],
-                size[2],
+                unwrap_or_ret_none!(size[0].try_into()),
+                unwrap_or_ret_none!(size[1].try_into()),
+                unwrap_or_ret_none!(size[2].try_into()),
                 0,
-                fmt,
+                format,
                 crate::type_to_gl_enum::<ET>()?,
                 &data[0] as *const ET as *const std::ffi::c_void,
             );
