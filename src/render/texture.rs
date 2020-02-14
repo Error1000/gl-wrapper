@@ -41,19 +41,19 @@ impl TextureBase {
 }
 
 pub trait TextureFunc {
-    fn bind_texture_for_sampling(self: &Self, sampler_id: GLuint) {
+    fn bind_texture(self: &Self, sampler_id: GLuint) {
         unsafe {
-            self.bind_texture_for_data();
+            gl::BindTexture(Self::get_type(), self.get_tex_base().id);
             gl::ActiveTexture(gl::TEXTURE0 + sampler_id);
         }
     }
 
-    fn bind_texture_for_data(self: &Self) {
+    /*fn bind_texture_for_data(self: &Self) {
         unsafe {
             gl::ActiveTexture(gl::TEXTURE0);
             gl::BindTexture(Self::get_type(), self.get_tex_base().id);
         }
-    }
+    }*/
 
     fn set_min_filter_of_bound_tex(self: &mut Self, min_filter: GLint) {
         unsafe {

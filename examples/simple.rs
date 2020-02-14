@@ -100,12 +100,12 @@ fn main() {
         let im = image::open(&Path::new("apple.png"))
             .expect("Failed to read texture from disk! Are you sure it exists?")
             .into_rgba();
-        t.bind_texture_for_data();
+        t.bind_texture(program.get_sampler_id("obj_tex"));
         t.upload_data_to_bound_texture([im.width(), im.height()], im.as_ref(), gl::RGBA)
             .expect(
                 "Failed to upload texture data to gpu ( are you sure the texture is valid? ) !",
             );
-        t.bind_texture_for_sampling(program.get_sampler_id("obj_tex"));
+        //t.bind_texture_for_sampling(program.get_sampler_id("obj_tex"));
     }
     println!("Done!");
 

@@ -6,6 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="efb3930f-a966-48e8-a961-4513db482a27" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/simple.rs" beforeDir="false" afterPath="$PROJECT_DIR$/examples/simple.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/render/texture.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/render/texture.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -35,7 +37,7 @@
   <component name="PropertiesComponent">
     <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../gl-puck" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="org.rust.cargo.project.model.PROJECT_DISCOVERY" value="true" />
     <property name="org.rust.hideDetachedFileNotifications/home/dan/Documents/Coding/Rust/OpenGLWrapper/src/util/mod.rs" value="true" />
     <property name="org.rust.hideDetachedFileNotifications/home/dan/Documents/Coding/Rust/gl-wrapper/src/API.rs" value="true" />
