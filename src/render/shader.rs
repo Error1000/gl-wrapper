@@ -42,7 +42,7 @@ impl ShaderBase {
                 gl::GetShaderiv(r.id, gl::INFO_LOG_LENGTH, &mut len);
                 let new_len: usize = match len.try_into(){
 				Ok(val) => val,
-				Err(_) => return Err(String::from("Length of error message of shader compialtion is either too big or negative!")),
+				Err(_) => return Err(String::from("Length of error message of shader compilation is either too big or negative!")),
 			    };
                 let mut buf = Vec::<u8>::with_capacity(new_len);
                 buf.set_len(new_len - 1); // subtract 1 to skip the trailing null character
