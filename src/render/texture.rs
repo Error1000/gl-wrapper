@@ -45,7 +45,7 @@ pub trait TextureFunc {
         unsafe {
             gl::ActiveTexture(gl::TEXTURE0 + sampler_id);
             gl::BindTexture(Self::get_type(), self.get_tex_base().id);
-
+            gl::ActiveTexture(gl::TEXTURE0 + sampler_id);
         }
     }
 
