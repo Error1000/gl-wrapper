@@ -1,4 +1,3 @@
-use crate::api;
 use gl::types::*;
 use std::convert::TryInto;
 use std::ffi::CString;
@@ -51,10 +50,9 @@ impl ShaderBase {
 
                 return match str::from_utf8(&buf) {
                     Ok(msg) => {
-                        let t = String::from(match api::gl_shader_enum_to_string(sh_type) {
-                            Some(s) => s,
-                            None => "unknown",
-                        });
+                        let t = String::from(
+                            crate::shader_glenum_to_string(sh_type).unwrap_or("unknown"),
+                        );
                         Err(String::from(msg)
                             + &String::from("In shader of type: ")
                             + &t
@@ -72,7 +70,7 @@ impl ShaderBase {
 
     // NEEDED BY Program
     pub(crate) fn get_id(self: &Self) -> GLuint {
-        self.id.clone() // make sure we don't give up our id ( i know this si redundant )
+        self.id.clone() // make sure we don't give up our id ( i know this is redundant )
     }
 }
 

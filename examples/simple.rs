@@ -8,9 +8,7 @@ use gl_wrapper::util::buffer_obj::BOFunc;
 use gl_wrapper::util::*;
 
 use glutin::dpi::PhysicalSize;
-use image::GenericImageView;
 use std::convert::TryInto;
-use std::ffi::CStr;
 
 use gl::types::*;
 use std::ptr;
@@ -20,8 +18,9 @@ use glutin::event::{Event, WindowEvent};
 use glutin::event_loop::{ControlFlow, EventLoop};
 use glutin::window::WindowBuilder;
 
-use std::path::Path;
 use glutin::platform::desktop::EventLoopExtDesktop;
+use std::path::Path;
+use std::time::Instant;
 
 // Vertex data
 static VERTEX_DATA: [GLfloat; 8] = [-1.0, 1.0, 1.0, 1.0, 1.0, -1.0, -1.0, -1.0];
@@ -61,24 +60,16 @@ fn main() {
         })
         .with_visible(false); // Hide window while loading to make it less annoying
     let gl_window = glutin::ContextBuilder::new()
+        .with_vsync(true)
         .build_windowed(window, &events_loop)
         .expect("Failed to create window!");
     let gl_window = unsafe { gl_window.make_current() }.unwrap();
 
     // Load the OpenGL function pointers
-    gl_wrapper::api::init(&gl_window);
-    println!(
-        "Window created but hidden so that we don't have an annoying hang as the program loads!"
-    );
+    gl_wrapper::init(&gl_window);
+    println!("Window created but hidden!");
 
-    let v = unsafe {
-        let data = CStr::from_ptr(gl::GetString(gl::VERSION) as *const i8)
-            .to_bytes()
-            .to_vec();
-        String::from_utf8(data).unwrap()
-    };
-
-    println!("OpenGL Version: {}", v);
+    println!("OpenGL Version: {}", gl_wrapper::get_gl_version_str());
 
     // Create GLSL shaders
     println!("Loading shaders ...");
@@ -90,6 +81,7 @@ fn main() {
     };
 
     program.bind_program();
+    // TODO: Maybe add a load_attributes/uniforms to programs to make loading a lot of these vars at once easier
     program
         .load_attribute("position")
         .expect("Failed to load attribute from shader!");
@@ -103,19 +95,21 @@ fn main() {
 
     // Load textures
     println!("Loading textures ...");
-    let im = image::open(&Path::new("apple.png"))
-        .expect("Failed to read texture from disk! Are you sure it exists?");
-    let data: &[u8] = &im.to_bytes()[..];
+
     let mut t = texture::Texture2D::new();
-    t.bind_texture_for_data();
-    t.upload_data_to_bound_texture([
-                                       im.width().try_into().expect("Image size is either too big or negative, in any of those cases that's not a good sign!"),
-                                       im.height().try_into().expect("Image size is either too big or negative, in any of those cases that's not a good sign!")
-                                        ],
-                                    data,
-                                   4 /* RGBA has 4 channel per pixel*/
-    ).expect("Failed to upload texture data to gpu!");
-    t.bind_texture_for_sampling(program.get_sampler_id("obj_tex"));
+    {
+        let im = image::open(&Path::new("apple.png"))
+            .expect("Failed to read texture from disk! Are you sure it exists?")
+            .into_rgba();
+        t.bind_texture_for_data();
+        t.upload_data_to_bound_texture(
+            [im.width(), im.height()],
+            im.as_ref(),
+            4, /* RGBA has 4 channel per pixel*/
+        )
+        .expect("Failed to upload texture data to gpu ( are you sure the texture is valid? ) !");
+        t.bind_texture_for_sampling(program.get_sampler_id("obj_tex"));
+    }
     println!("Done!");
 
     // Load mesh data ( indices, vertices, uv data )
@@ -146,20 +140,14 @@ fn main() {
     println!("Showing window!");
     gl_window.window().set_visible(true);
 
-    unsafe {
-        gl::ClearColor(0.0, 0.0, 1.0, 1.0);
-    }
+    gl_wrapper::set_gl_clear_color(0.0, 0.0, 1.0, 1.0);
     // Since these values won't change and the gl::DrawElements is in the hot path we are going to cache these values now just to make things simpler and faster
     let ibo_len = ind_ibo
         .get_size()
         .try_into()
         .expect("The number of triangles you have is either negative, or too big!");
-    let ibo_enum_type = gl_wrapper::api::type_to_gl_enum::<GLushort>().unwrap();
-    let render = move || unsafe {
-        gl::Clear(gl::COLOR_BUFFER_BIT);
-        gl::DrawElements(gl::TRIANGLES, ibo_len, ibo_enum_type, ptr::null());
-    };
-
+    let ibo_enum_type = gl_wrapper::type_to_gl_enum::<GLushort>().unwrap();
+    let mut t = Instant::now();
     // Note we use run-return to make sure that everything gets dropped ( although run also works )
     events_loop.run_return(|event, _, control_flow| {
         // Unless we re write the control flow just wait until another evetn arrives when this iteration finished
@@ -167,26 +155,35 @@ fn main() {
         match event {
             // Window stuff
             Event::WindowEvent { event, .. } => {
-                match event{
-                    WindowEvent::Resized(PhysicalSize{width, height}) => {
-                        unsafe {
-                            gl::Viewport(0, 0, width.try_into().expect("Either your window's width has a negative size(wut?) or is too big(how even?), opengl can't handle that number!"),
-                                         height.try_into().expect("Either your window' height has a negative size(wut?) or is too big(how even?), opengl can't handle that number!"));
-                        }
-                        render();
-                    },
+                match event {
+                    WindowEvent::Resized(PhysicalSize { width, height }) => {
+                        gl_wrapper::set_gl_draw_size(width, height);
+                        //render();
+                    }
                     WindowEvent::CloseRequested => *control_flow = ControlFlow::Exit,
                     WindowEvent::KeyboardInput {
-                        input: glutin::event::KeyboardInput{ virtual_keycode: Some(glutin::event::VirtualKeyCode::Escape), .. },
-                     .. } => *control_flow = ControlFlow::Exit,
+                        input:
+                            glutin::event::KeyboardInput {
+                                virtual_keycode: Some(glutin::event::VirtualKeyCode::Escape),
+                                ..
+                            },
+                        ..
+                    } => *control_flow = ControlFlow::Exit,
                     _ => {}
                 }
-            },
+            }
             // Rendering stuff
-            Event::RedrawRequested(..) => {
-                render();
-                gl_window.swap_buffers().unwrap();
-            },
+            Event::RedrawEventsCleared => {
+                // Lock FPS to 60
+                if 1.0 / (t.elapsed().as_secs_f32()) < 61.0 {
+                    unsafe {
+                        gl::Clear(gl::COLOR_BUFFER_BIT);
+                        gl::DrawElements(gl::TRIANGLES, ibo_len, ibo_enum_type, ptr::null());
+                    }
+                    gl_window.swap_buffers().unwrap();
+                    t = Instant::now();
+                }
+            }
             _ => {}
         }
     });

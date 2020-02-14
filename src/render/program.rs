@@ -1,4 +1,5 @@
 use crate::render::shader::*;
+use crate::unwrap_or_ret_none;
 use gl::types::*;
 use std::collections::HashMap;
 use std::convert::TryInto;
@@ -88,19 +89,13 @@ impl Program {
         get_location: unsafe fn(GLuint, *const GLchar) -> GLint,
     ) -> Option<u32> {
         let id = {
-            let cname = match CString::new(name.as_bytes()) {
-                Ok(val) => val,
-                Err(_) => return None
-            };
+            let cname = unwrap_or_ret_none!(CString::new(name.as_bytes()));
             unsafe { get_location(self.id, cname.as_ptr() as *const GLchar) }
         };
         if id < 0 {
             return None;
         }
-        let id: u32 = match id.try_into() {
-            Ok(val) => val,
-            Err(_) => return None,
-        };
+        let id: u32 = unwrap_or_ret_none!(id.try_into());
         Some(id)
     }
 
@@ -133,44 +128,86 @@ impl Program {
     }
 
     #[inline]
-    pub fn set_uniform_i32(self: &mut Self, id: GLint, val: i32) { unsafe { gl::Uniform1i(id, val); } }
+    pub fn set_uniform_i32(self: &mut Self, id: GLint, val: i32) {
+        unsafe {
+            gl::Uniform1i(id, val);
+        }
+    }
 
     #[inline]
-    pub fn set_uniform_u32(self: &mut Self, id: GLint, val: u32) { unsafe { gl::Uniform1ui(id, val); } }
+    pub fn set_uniform_u32(self: &mut Self, id: GLint, val: u32) {
+        unsafe {
+            gl::Uniform1ui(id, val);
+        }
+    }
 
     #[inline]
-    pub fn set_uniform_f32(self: &mut Self, id: GLint, val: f32) { unsafe { gl::Uniform1f(id, val); } }
-
-
-    #[inline]
-    pub fn set_uniform_vec3_f32(self: &mut Self, id: GLint, val: [f32; 3]) { unsafe { gl::Uniform3fv(id, 1, val.as_ptr()); } }
-
-    #[inline]
-    pub fn set_uniform_vec3_i32(self: &mut Self, id: GLint, val: [i32; 3]) { unsafe { gl::Uniform3iv(id, 1, val.as_ptr()); } }
+    pub fn set_uniform_f32(self: &mut Self, id: GLint, val: f32) {
+        unsafe {
+            gl::Uniform1f(id, val);
+        }
+    }
 
     #[inline]
-    pub fn set_uniform_vec3_u32(self: &mut Self, id: GLint, val: [u32; 3]) { unsafe { gl::Uniform3uiv(id, 1, val.as_ptr()); } }
-
-
-    #[inline]
-    pub fn set_uniform_vec2_f32(self: &mut Self, id: GLint, val: [f32; 2]) { unsafe { gl::Uniform2fv(id, 1, val.as_ptr()); } }
-
-    #[inline]
-    pub fn set_uniform_vec2_i32(self: &mut Self, id: GLint, val: [i32; 2]) { unsafe { gl::Uniform2iv(id, 1, val.as_ptr()); } }
+    pub fn set_uniform_vec3_f32(self: &mut Self, id: GLint, val: [f32; 3]) {
+        unsafe {
+            gl::Uniform3fv(id, 1, val.as_ptr());
+        }
+    }
 
     #[inline]
-    pub fn set_uniform_vec2_u32(self: &mut Self, id: GLint, val: [u32; 2]) { unsafe { gl::Uniform2uiv(id, 1, val.as_ptr()); } }
-
-
-    #[inline]
-    pub fn set_uniform_mat3_f32(self: &mut Self, id: GLint, val: &[f32; 3 * 3]) { unsafe { gl::UniformMatrix3fv(id, 1, gl::FALSE, val.as_ptr()); } }
-
-    #[inline]
-    pub fn set_uniform_mat4_f32(self: &mut Self, id: GLint, val: &[f32; 4 * 4]) { unsafe { gl::UniformMatrix4fv(id, 1, gl::FALSE, val.as_ptr()); } }
-
+    pub fn set_uniform_vec3_i32(self: &mut Self, id: GLint, val: [i32; 3]) {
+        unsafe {
+            gl::Uniform3iv(id, 1, val.as_ptr());
+        }
+    }
 
     #[inline]
-    pub fn get_attribute_hashmap(self: &Self) -> &HashMap<&'static str, GLuint> { &self.attrib_ids }
+    pub fn set_uniform_vec3_u32(self: &mut Self, id: GLint, val: [u32; 3]) {
+        unsafe {
+            gl::Uniform3uiv(id, 1, val.as_ptr());
+        }
+    }
+
+    #[inline]
+    pub fn set_uniform_vec2_f32(self: &mut Self, id: GLint, val: [f32; 2]) {
+        unsafe {
+            gl::Uniform2fv(id, 1, val.as_ptr());
+        }
+    }
+
+    #[inline]
+    pub fn set_uniform_vec2_i32(self: &mut Self, id: GLint, val: [i32; 2]) {
+        unsafe {
+            gl::Uniform2iv(id, 1, val.as_ptr());
+        }
+    }
+
+    #[inline]
+    pub fn set_uniform_vec2_u32(self: &mut Self, id: GLint, val: [u32; 2]) {
+        unsafe {
+            gl::Uniform2uiv(id, 1, val.as_ptr());
+        }
+    }
+
+    #[inline]
+    pub fn set_uniform_mat3_f32(self: &mut Self, id: GLint, val: &[f32; 3 * 3]) {
+        unsafe {
+            gl::UniformMatrix3fv(id, 1, gl::FALSE, val.as_ptr());
+        }
+    }
+
+    #[inline]
+    pub fn set_uniform_mat4_f32(self: &mut Self, id: GLint, val: &[f32; 4 * 4]) {
+        unsafe {
+            gl::UniformMatrix4fv(id, 1, gl::FALSE, val.as_ptr());
+        }
+    }
+
+    #[inline]
+    pub fn get_attribute_hashmap(self: &Self) -> &HashMap<&'static str, GLuint> {
+        &self.attrib_ids
+    }
 
     #[inline]
     pub fn get_uniform_hashmap(self: &Self) -> &HashMap<&'static str, GLuint> {
@@ -180,11 +217,17 @@ impl Program {
     /// I know unsafe is not a good idea but the code bloat is pretty big plus the only error that these functions can cause is either because memory corruption or bad usage of the api that could lead to undefined behaviour plus if the user really wants they can catch the unwrap soo, i'm sorry
 
     #[inline]
-    pub fn get_uniform_id(self: &Self, name: &'static str) -> GLuint { self.uniform_ids.get(name).unwrap().clone() }
+    pub fn get_uniform_id(self: &Self, name: &'static str) -> GLuint {
+        *self.uniform_ids.get(name).unwrap()
+    }
 
     #[inline]
-    pub fn get_attribute_id(self: &Self, name: &'static str) -> GLuint { self.attrib_ids.get(name).unwrap().clone() }
+    pub fn get_attribute_id(self: &Self, name: &'static str) -> GLuint {
+        *self.attrib_ids.get(name).unwrap()
+    }
 
     #[inline]
-    pub fn get_sampler_id(self: &Self, name: &'static str) -> GLuint { self.get_uniform_id(name) }
+    pub fn get_sampler_id(self: &Self, name: &'static str) -> GLuint {
+        self.get_uniform_id(name)
+    }
 }

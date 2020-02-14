@@ -1,5 +1,6 @@
+use crate::unwrap_or_ret_none;
 use gl::types::*;
-use std::convert::{TryFrom, TryInto};
+use std::convert::TryFrom;
 use std::marker::PhantomData;
 use std::mem::size_of;
 
@@ -59,18 +60,11 @@ impl<ET> VBO<ET> {
     }
 
     pub fn upload_to_bound_bo(self: &mut Self, data: &[ET], usage: GLenum) -> Option<()> {
-        self.0.size = match isize::try_from(data.len()) {
-            Ok(val) => val,
-            Err(_) => return None,
-        };
+        self.0.size = unwrap_or_ret_none!(isize::try_from(data.len()));
         unsafe {
             gl::BufferData(
                 Self::get_type(),
-                self.get_size()
-                    * match isize::try_from(size_of::<ET>()) {
-                        Ok(v) => v,
-                        Err(_) => return None,
-                    },
+                self.get_size() * unwrap_or_ret_none!(isize::try_from(size_of::<ET>())),
                 &data[0] as *const ET as *const std::ffi::c_void,
                 usage,
             );
@@ -92,18 +86,11 @@ impl<ET> IBO<ET> {
     }
 
     pub fn upload_to_bound_bo(self: &mut Self, data: &[ET], usage: GLenum) -> Option<()> {
-        self.0.size = match isize::try_from(data.len()) {
-            Ok(val) => val,
-            Err(_) => return None,
-        };
+        self.0.size = unwrap_or_ret_none!(isize::try_from(data.len()));
         unsafe {
             gl::BufferData(
                 Self::get_type(),
-                self.get_size()
-                    * match isize::try_from(size_of::<ET>()) {
-                        Ok(v) => v,
-                        Err(_) => return None,
-                    },
+                self.get_size() * unwrap_or_ret_none!(isize::try_from(size_of::<ET>())),
                 &data[0] as *const ET as *const std::ffi::c_void,
                 usage,
             );

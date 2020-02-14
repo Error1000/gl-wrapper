@@ -1,7 +1,6 @@
 use gl::types::*;
 use std::ptr;
 
-use crate::api;
 use crate::render::program;
 use crate::util::buffer_obj;
 
@@ -58,7 +57,7 @@ impl VAO {
         index: GLuint,
     ) -> Result<(), &'static str> {
         unsafe {
-            let t = match api::type_to_gl_enum::<ET>() {
+            let t = match crate::type_to_gl_enum::<ET>() {
                 Some(r) => r,
                 None => {
                     return Err("Invalid type for buffer data (a.k.a the type of the elements of the buffer you just passed me is not supported)");

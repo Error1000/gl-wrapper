@@ -1,6 +1,6 @@
-use crate::api;
+use crate::unwrap_or_ret_none;
 use gl::types::*;
-use std::convert::TryInto;
+use std::convert::{TryFrom, TryInto};
 
 pub struct TextureBase {
     id: GLuint,
@@ -101,18 +101,15 @@ impl Texture2D {
     /// CPP = channels per pixel ( examples: RGBA = 4 channels, RGB = 3 channels, RG = 2 channels, R = 1 channel, ... )
     pub fn upload_data_to_bound_texture<ET: 'static>(
         self: &mut Self,
-        size: [GLint; 2],
+        size: [u32; 2],
         data: &[ET],
         cpp: u8,
     ) -> Option<()> {
-        let l: i32 = match data.len().try_into() {
-            Ok(v) => v,
-            Err(_) => return None,
-        };
-        if size[0] * size[1] * i32::from(cpp) != l {
+        let l = unwrap_or_ret_none!(u32::try_from(data.len()));
+        if size[0] * size[1] * u32::from(cpp) != l {
             return None;
         }
-        let (internal_fmt, fmt) = api::texture_bits_to_opengl_types(
+        let (internal_fmt, fmt) = crate::texture_bits_to_gl_types(
             (std::mem::size_of::<ET>() * 8).try_into().unwrap(),
             cpp,
         )?;
@@ -121,11 +118,11 @@ impl Texture2D {
                 Self::get_type(),
                 0,
                 internal_fmt,
-                size[0],
-                size[1],
+                unwrap_or_ret_none!(size[0].try_into()),
+                unwrap_or_ret_none!(size[1].try_into()),
                 0,
                 fmt,
-                api::type_to_gl_enum::<ET>()?,
+                crate::type_to_gl_enum::<ET>()?,
                 &data[0] as *const ET as *const std::ffi::c_void,
             );
         }
@@ -145,14 +142,11 @@ impl Texture2DArray {
         data: &[ET],
         cpp: u8,
     ) -> Option<()> {
-        let l: i32 = match data.len().try_into() {
-            Ok(v) => v,
-            Err(_) => return None,
-        };
+        let l: i32 = unwrap_or_ret_none!(data.len().try_into());
         if size[0] * size[1] * size[2] * i32::from(cpp) != l {
             return None;
         }
-        let (internal_fmt, fmt) = api::texture_bits_to_opengl_types(
+        let (internal_fmt, fmt) = crate::texture_bits_to_gl_types(
             (std::mem::size_of::<ET>() * 8).try_into().unwrap(),
             cpp,
         )?;
@@ -166,7 +160,7 @@ impl Texture2DArray {
                 size[2],
                 0,
                 fmt,
-                api::type_to_gl_enum::<ET>()?,
+                crate::type_to_gl_enum::<ET>()?,
                 &data[0] as *const ET as *const std::ffi::c_void,
             );
         }
@@ -186,14 +180,11 @@ impl Texture3D {
         data: &[ET],
         cpp: u8,
     ) -> Option<()> {
-        let l: i32 = match data.len().try_into() {
-            Ok(v) => v,
-            Err(_) => return None,
-        };
+        let l: i32 = unwrap_or_ret_none!(data.len().try_into());
         if size[0] * size[1] * size[2] * i32::from(cpp) != l {
             return None;
         }
-        let (internal_fmt, fmt) = api::texture_bits_to_opengl_types(
+        let (internal_fmt, fmt) = crate::texture_bits_to_gl_types(
             (std::mem::size_of::<ET>() * 8).try_into().unwrap(),
             cpp,
         )?;
@@ -207,7 +198,7 @@ impl Texture3D {
                 size[2],
                 0,
                 fmt,
-                api::type_to_gl_enum::<ET>()?,
+                crate::type_to_gl_enum::<ET>()?,
                 &data[0] as *const ET as *const std::ffi::c_void,
             );
         }
