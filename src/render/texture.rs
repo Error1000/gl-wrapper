@@ -35,6 +35,20 @@ impl TextureBase {
                     .try_into()
                     .expect("FATAL Failure, faulty opengl implementation!"),
             );
+            gl::TexParameteri(
+                typ,
+                gl::GL_TEXTURE_WRAP_S,
+                gl::GL_CLAMP_TO_EDGE
+                    .try_into()
+                    .expect("FATAL Failure, faulty opengl implementation!"),
+            );
+            gl::TexParameteri(
+                typ,
+                gl::GL_CLAMP_TO_EDGE,
+                gl::LINEAR
+                    .try_into()
+                    .expect("FATAL Failure, faulty opengl implementation!"),
+            );
         }
         r
     }
