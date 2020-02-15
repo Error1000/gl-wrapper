@@ -58,6 +58,8 @@ impl TextureBase {
 pub trait TextureFunc {
     fn bind_texture_for_sampling(self: &Self, sampler_id: GLuint) {
         unsafe {
+	    gl::ActiveTexture(gl::TEXTURE0);
+            gl::BindTexture(Self::get_type(), 0);
             gl::ActiveTexture(gl::TEXTURE0 + sampler_id);
             gl::BindTexture(Self::get_type(), self.get_tex_base().id);
         }
@@ -140,7 +142,6 @@ impl Texture2D {
                 crate::type_to_gl_enum::<ET>()?,
                 &data[0] as *const ET as *const std::ffi::c_void,
             );
-	   gl::GenerateMipmap(Self::get_type());
         }
         Some(())
     }
