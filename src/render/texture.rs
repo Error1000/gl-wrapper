@@ -59,9 +59,8 @@ pub trait TextureFunc {
     fn bind_texture_for_sampling(self: &Self, sampler_id: GLuint) {
         unsafe {
 	    gl::ActiveTexture(gl::TEXTURE0);
-            gl::BindTexture(Self::get_type(), 0);
-            gl::ActiveTexture(gl::TEXTURE0 + sampler_id);
             gl::BindTexture(Self::get_type(), self.get_tex_base().id);
+            gl::ActiveTexture(gl::TEXTURE0 + sampler_id);
         }
     }
 
