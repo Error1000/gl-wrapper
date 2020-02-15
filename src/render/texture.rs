@@ -51,7 +51,6 @@ pub trait TextureFunc {
 
     fn bind_texture_for_data(self: &Self) {
         unsafe {
-            gl::ActiveTexture(gl::TEXTURE0);
             gl::BindTexture(Self::get_type(), self.get_tex_base().id);
         }
     }
