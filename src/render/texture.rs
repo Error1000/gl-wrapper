@@ -140,6 +140,7 @@ impl Texture2D {
                 crate::type_to_gl_enum::<ET>()?,
                 &data[0] as *const ET as *const std::ffi::c_void,
             );
+	   gl::GenerateMipmap(Self::get_type());
         }
         Some(())
     }
