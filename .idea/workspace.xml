@@ -6,6 +6,9 @@
   <component name="ChangeListManager">
     <list default="true" id="efb3930f-a966-48e8-a961-4513db482a27" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/simple.rs" beforeDir="false" afterPath="$PROJECT_DIR$/examples/simple.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/render/program.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/render/program.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/render/texture.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/render/texture.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -35,7 +38,7 @@
   <component name="PropertiesComponent">
     <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../gl-puck" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="org.rust.cargo.project.model.PROJECT_DISCOVERY" value="true" />
     <property name="org.rust.hideDetachedFileNotifications/home/dan/Documents/Coding/Rust/OpenGLWrapper/src/util/mod.rs" value="true" />
     <property name="org.rust.hideDetachedFileNotifications/home/dan/Documents/Coding/Rust/gl-wrapper/src/API.rs" value="true" />
@@ -258,22 +261,22 @@
       <screen x="0" y="0" width="1920" height="1051" />
     </state>
     <state x="743" y="284" width="428" height="484" key="FileChooserDialogImpl/0.0.1920.1051@0.0.1920.1051" timestamp="1581709235574" />
-    <state width="914" height="276" key="GridCell.Tab.0.bottom" timestamp="1581709235593">
+    <state width="914" height="276" key="GridCell.Tab.0.bottom" timestamp="1581770178149">
       <screen x="0" y="0" width="1920" height="1051" />
     </state>
-    <state width="914" height="276" key="GridCell.Tab.0.bottom/0.0.1920.1051@0.0.1920.1051" timestamp="1581709235593" />
-    <state width="914" height="276" key="GridCell.Tab.0.center" timestamp="1581709235593">
+    <state width="914" height="276" key="GridCell.Tab.0.bottom/0.0.1920.1051@0.0.1920.1051" timestamp="1581770178149" />
+    <state width="914" height="276" key="GridCell.Tab.0.center" timestamp="1581770178149">
       <screen x="0" y="0" width="1920" height="1051" />
     </state>
-    <state width="914" height="276" key="GridCell.Tab.0.center/0.0.1920.1051@0.0.1920.1051" timestamp="1581709235593" />
-    <state width="914" height="276" key="GridCell.Tab.0.left" timestamp="1581709235592">
+    <state width="914" height="276" key="GridCell.Tab.0.center/0.0.1920.1051@0.0.1920.1051" timestamp="1581770178149" />
+    <state width="914" height="276" key="GridCell.Tab.0.left" timestamp="1581770178142">
       <screen x="0" y="0" width="1920" height="1051" />
     </state>
-    <state width="914" height="276" key="GridCell.Tab.0.left/0.0.1920.1051@0.0.1920.1051" timestamp="1581709235592" />
-    <state width="914" height="276" key="GridCell.Tab.0.right" timestamp="1581709235593">
+    <state width="914" height="276" key="GridCell.Tab.0.left/0.0.1920.1051@0.0.1920.1051" timestamp="1581770178142" />
+    <state width="914" height="276" key="GridCell.Tab.0.right" timestamp="1581770178149">
       <screen x="0" y="0" width="1920" height="1051" />
     </state>
-    <state width="914" height="276" key="GridCell.Tab.0.right/0.0.1920.1051@0.0.1920.1051" timestamp="1581709235593" />
+    <state width="914" height="276" key="GridCell.Tab.0.right/0.0.1920.1051@0.0.1920.1051" timestamp="1581770178149" />
     <state x="506" y="151" key="SettingsEditor" timestamp="1581243076011">
       <screen x="0" y="0" width="1920" height="1051" />
     </state>

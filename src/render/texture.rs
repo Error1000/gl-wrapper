@@ -35,26 +35,12 @@ impl TextureBase {
                     .try_into()
                     .expect("FATAL Failure, faulty opengl implementation!"),
             );
-            gl::TexParameteri(
-                typ,
-                gl::TEXTURE_WRAP_S,
-                gl::CLAMP_TO_EDGE
-                    .try_into()
-                    .expect("FATAL Failure, faulty opengl implementation!"),
-            );
-            gl::TexParameteri(
-                typ,
-                gl::TEXTURE_WRAP_T,
-                gl::CLAMP_TO_EDGE
-                    .try_into()
-                    .expect("FATAL Failure, faulty opengl implementation!"),
-            );
         }
         r
     }
 }
 
-// TODO: Make sure this works when using multipel textures
+// TODO: Make sure this works when using multiple textures
 pub trait TextureFunc {
     fn bind_texture_for_sampling(self: &Self, sampler_id: GLuint) {
         unsafe {
@@ -113,6 +99,12 @@ pub struct Texture3D(TextureBase);
 impl Texture2D {
     pub fn new() -> Self {
         Self(TextureBase::new(Self::get_type()))
+    }
+
+    pub fn with_data<ET: 'static>(size: [u32; 2], data: &[ET], format: GLenum) -> Option<Self>{
+        let mut r = Self::new();
+        r.upload_data_to_bound_texture(size, data, format)?;
+        Some(r)
     }
 
     pub fn upload_data_to_bound_texture<ET: 'static>(

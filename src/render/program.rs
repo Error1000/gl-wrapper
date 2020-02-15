@@ -43,6 +43,7 @@ impl Program {
         unsafe {
             gl::GetProgramiv(r.id, gl::LINK_STATUS, &mut program_compiled);
         }
+
         if program_compiled != gl::TRUE.into() {
             let mut len: i32 = 0;
             unsafe {

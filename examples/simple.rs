@@ -92,21 +92,19 @@ fn main() {
         .expect("Failed to load attribute from shader!");
     println!("Done!");
 
+    // NOTE: "with_data" constructors grantee that the object crated WILL be bound "new" constructors do not
     // Load textures
     println!("Loading textures ...");
 
-    let mut t = texture::Texture2D::new();
-    {
+    let t = {
         let im = image::open(&Path::new("apple.png"))
             .expect("Failed to read texture from disk! Are you sure it exists?")
             .into_rgba();
-        t.bind_texture(program.get_sampler_id("obj_tex"));
-        t.upload_data_to_bound_texture([im.width(), im.height()], im.as_ref(), gl::RGBA)
-            .expect(
-                "Failed to upload texture data to gpu ( are you sure the texture is valid? ) !",
-            );
-        //t.bind_texture_for_sampling(program.get_sampler_id("obj_tex"));
-    }
+        texture::Texture2D::with_data([im.width(), im.height()], im.as_ref(), gl::RGBA)
+            .expect("Failed to crate texture!")
+    };
+    t.bind_texture_for_sampling(program.get_sampler_id("obj_tex"));
+
     println!("Done!");
 
     // Load mesh data ( indices, vertices, uv data )
@@ -114,7 +112,6 @@ fn main() {
     let mut a = aggregator_obj::VAO::new();
     a.bind_vao_for_data();
 
-    // NOTE: Creating a vbo with data auto binds it, creating a vbo using new does not
     let pos_vbo = buffer_obj::VBO::<GLfloat>::with_data(2, &VERTEX_DATA, gl::STATIC_DRAW)
         .expect("Failed to upload data to vbo!");
     a.attach_bound_vbo_to_bound_vao(&pos_vbo, program.get_attribute_id("position"))
@@ -127,11 +124,8 @@ fn main() {
 
     a.bind_vao_for_program(&program).expect("Shader is asking for more values than vao has attached, all attributes the shader uses must be attached to vao!");
 
-    let mut ind_ibo = buffer_obj::IBO::<GLushort>::new();
-    ind_ibo.bind_bo();
-    ind_ibo
-        .upload_to_bound_bo(&IND_DATA, gl::STATIC_DRAW)
-        .expect("Failed to upload data to ibo!");
+    let ind_ibo = buffer_obj::IBO::<GLushort>::with_data(&IND_DATA, gl::STATIC_DRAW)
+        .expect("Failed to create ibo!");
     println!("Done!");
 
     println!("Showing window!");
