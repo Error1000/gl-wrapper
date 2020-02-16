@@ -101,18 +101,20 @@ impl Texture2D {
         Self(TextureBase::new(Self::get_type()))
     }
 
-    pub fn with_data<ET: 'static>(size: [u32; 2], data: &[ET], format: GLenum) -> Option<Self>{
+    pub fn with_data<ET>(size: [u32; 2], data: &[ET], format: GLenum) -> Option<Self>
+    where ET: 'static{
         let mut r = Self::new();
         r.upload_data_to_bound_texture(size, data, format)?;
         Some(r)
     }
 
-    pub fn upload_data_to_bound_texture<ET: 'static>(
+    pub fn upload_data_to_bound_texture<ET>(
         self: &mut Self,
         size: [u32; 2],
         data: &[ET],
         format: GLenum,
-    ) -> Option<()> {
+    ) -> Option<()>
+    where ET: 'static{
         let l: u32 = unwrap_or_ret_none!(data.len().try_into());
         let (internal_fmt, cpp) = crate::format_to_gl_internal_format(
             (std::mem::size_of::<ET>() * 8).try_into().unwrap(),
@@ -143,12 +145,13 @@ impl Texture2DArray {
         Self(TextureBase::new(Self::get_type()))
     }
 
-    pub fn upload_data_to_bound_texture<ET: 'static>(
+    pub fn upload_data_to_bound_texture<ET>(
         self: &mut Self,
         size: [u32; 3],
         data: &[ET],
         format: GLenum,
-    ) -> Option<()> {
+    ) -> Option<()>
+    where ET: 'static{
         let l: u32 = unwrap_or_ret_none!(data.len().try_into());
         let (internal_fmt, cpp) = crate::format_to_gl_internal_format(
             (std::mem::size_of::<ET>() * 8).try_into().unwrap(),
@@ -180,12 +183,13 @@ impl Texture3D {
         Self(TextureBase::new(Self::get_type()))
     }
 
-    pub fn upload_data_to_bound_texture<ET: 'static>(
+    pub fn upload_data_to_bound_texture<ET>(
         self: &mut Self,
         size: [u32; 3],
         data: &[ET],
         format: GLenum,
-    ) -> Option<()> {
+    ) -> Option<()>
+    where ET: 'static{
         let l: u32 = unwrap_or_ret_none!(data.len().try_into());
         let (internal_fmt, cpp) = crate::format_to_gl_internal_format(
             (std::mem::size_of::<ET>() * 8).try_into().unwrap(),

@@ -56,24 +56,25 @@ pub fn set_gl_draw_size(w: u32, h: u32) -> Option<()> {
     Some(())
 }
 
-pub fn type_to_gl_enum<T: 'static>() -> Option<GLenum> {
-    if TypeId::of::<T>() == TypeId::of::<GLfloat>() {
-        Some(gl::FLOAT)
-    } else if TypeId::of::<T>() == TypeId::of::<GLint>() {
-        Some(gl::INT)
-    } else if TypeId::of::<T>() == TypeId::of::<GLuint>() {
-        Some(gl::UNSIGNED_INT)
-    } else if TypeId::of::<T>() == TypeId::of::<GLshort>() {
-        Some(gl::SHORT)
-    } else if TypeId::of::<T>() == TypeId::of::<GLushort>() {
-        Some(gl::UNSIGNED_SHORT)
-    } else if TypeId::of::<T>() == TypeId::of::<GLubyte>() {
-        Some(gl::UNSIGNED_BYTE)
-    } else if TypeId::of::<T>() == TypeId::of::<GLbyte>() {
-        Some(gl::BYTE)
-    } else {
-        None
-    }
+pub fn type_to_gl_enum<T>() -> Option<GLenum>
+    where T: 'static{
+        if TypeId::of::<T>() == TypeId::of::<GLfloat>() {
+            Some(gl::FLOAT)
+        } else if TypeId::of::<T>() == TypeId::of::<GLint>() {
+            Some(gl::INT)
+        } else if TypeId::of::<T>() == TypeId::of::<GLuint>() {
+            Some(gl::UNSIGNED_INT)
+        } else if TypeId::of::<T>() == TypeId::of::<GLshort>() {
+            Some(gl::SHORT)
+        } else if TypeId::of::<T>() == TypeId::of::<GLushort>() {
+            Some(gl::UNSIGNED_SHORT)
+        } else if TypeId::of::<T>() == TypeId::of::<GLubyte>() {
+            Some(gl::UNSIGNED_BYTE)
+        } else if TypeId::of::<T>() == TypeId::of::<GLbyte>() {
+            Some(gl::BYTE)
+        } else {
+            None
+        }
 }
 
 #[inline]
