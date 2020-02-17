@@ -57,7 +57,9 @@ impl VAO {
         bo: &buffer_obj::VBO<ET>,
         index: GLuint,
     ) -> Result<(), &'static str>
-    where ET: HasGLEnum{
+    where
+        ET: HasGLEnum,
+    {
         unsafe {
             gl::VertexAttribPointer(
                 index,

@@ -55,44 +55,57 @@ pub fn set_gl_draw_size(w: u32, h: u32) -> Option<()> {
     Some(())
 }
 
-pub trait HasGLEnum{
+pub trait HasGLEnum {
     fn get_gl_enum() -> GLenum;
 }
 
-impl HasGLEnum for GLfloat{
+impl HasGLEnum for GLfloat {
     #[inline(always)]
-    fn get_gl_enum() -> GLenum { gl::FLOAT }
+    fn get_gl_enum() -> GLenum {
+        gl::FLOAT
+    }
 }
 
-impl HasGLEnum for GLint{
+impl HasGLEnum for GLint {
     #[inline(always)]
-    fn get_gl_enum() -> GLenum { gl::INT }
+    fn get_gl_enum() -> GLenum {
+        gl::INT
+    }
 }
-impl HasGLEnum for GLuint{
+impl HasGLEnum for GLuint {
     #[inline(always)]
-    fn get_gl_enum() -> GLenum{ gl::UNSIGNED_INT }
-}
-
-impl HasGLEnum for GLshort{
-    #[inline(always)]
-    fn get_gl_enum() -> GLenum { gl::SHORT }
-}
-
-impl HasGLEnum for GLushort{
-    #[inline(always)]
-    fn get_gl_enum() -> GLenum { gl::UNSIGNED_SHORT }
+    fn get_gl_enum() -> GLenum {
+        gl::UNSIGNED_INT
+    }
 }
 
-impl HasGLEnum for GLubyte{
+impl HasGLEnum for GLshort {
     #[inline(always)]
-    fn get_gl_enum() -> GLenum { gl::UNSIGNED_BYTE }
+    fn get_gl_enum() -> GLenum {
+        gl::SHORT
+    }
 }
 
-impl HasGLEnum for GLbyte{
+impl HasGLEnum for GLushort {
     #[inline(always)]
-    fn get_gl_enum() -> GLenum { gl::BYTE }
+    fn get_gl_enum() -> GLenum {
+        gl::UNSIGNED_SHORT
+    }
 }
 
+impl HasGLEnum for GLubyte {
+    #[inline(always)]
+    fn get_gl_enum() -> GLenum {
+        gl::UNSIGNED_BYTE
+    }
+}
+
+impl HasGLEnum for GLbyte {
+    #[inline(always)]
+    fn get_gl_enum() -> GLenum {
+        gl::BYTE
+    }
+}
 
 #[inline]
 pub fn shader_glenum_to_string(e: GLenum) -> Option<&'static str> {

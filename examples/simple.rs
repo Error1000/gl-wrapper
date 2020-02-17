@@ -145,30 +145,33 @@ fn main() {
         *control_flow = ControlFlow::Poll;
         match event {
             // Window stuff
-            Event::WindowEvent { event, .. } => {
-                match event {
-                    WindowEvent::Resized(PhysicalSize { width, height }) => {
-                        gl_wrapper::set_gl_draw_size(width, height);
-                    }
-                    WindowEvent::CloseRequested => *control_flow = ControlFlow::Exit,
-                    WindowEvent::KeyboardInput {
-                        input:
-                            glutin::event::KeyboardInput {
-                                virtual_keycode: Some(glutin::event::VirtualKeyCode::Escape),
-                                ..
-                            },
-                        ..
-                    } => *control_flow = ControlFlow::Exit,
-                    _ => {}
+            Event::WindowEvent { event, .. } => match event {
+                WindowEvent::Resized(PhysicalSize { width, height }) => {
+                    gl_wrapper::set_gl_draw_size(width, height);
                 }
-            }
+                WindowEvent::CloseRequested => *control_flow = ControlFlow::Exit,
+                WindowEvent::KeyboardInput {
+                    input:
+                        glutin::event::KeyboardInput {
+                            virtual_keycode: Some(glutin::event::VirtualKeyCode::Escape),
+                            ..
+                        },
+                    ..
+                } => *control_flow = ControlFlow::Exit,
+                _ => {}
+            },
             // Rendering stuff
             Event::RedrawEventsCleared => {
                 // Lock FPS to 60
                 if 1.0 / (t.elapsed().as_secs_f32()) < 61.0 {
                     unsafe {
                         gl::Clear(gl::COLOR_BUFFER_BIT);
-                        gl::DrawElements(gl::TRIANGLES, ibo_len, GLushort::get_gl_enum(), ptr::null());
+                        gl::DrawElements(
+                            gl::TRIANGLES,
+                            ibo_len,
+                            GLushort::get_gl_enum(),
+                            ptr::null(),
+                        );
                     }
                     gl_window.swap_buffers().unwrap();
                     t = Instant::now();

@@ -44,7 +44,7 @@ impl TextureBase {
 pub trait TextureFunc {
     fn bind_texture_for_sampling(self: &Self, sampler_id: GLuint) {
         unsafe {
-	    gl::ActiveTexture(gl::TEXTURE0);
+            gl::ActiveTexture(gl::TEXTURE0);
             gl::BindTexture(Self::get_type(), self.get_tex_base().id);
             gl::ActiveTexture(gl::TEXTURE0 + sampler_id);
         }
@@ -102,7 +102,9 @@ impl Texture2D {
     }
 
     pub fn with_data<ET>(size: [u32; 2], data: &[ET], format: GLenum) -> Option<Self>
-    where ET: HasGLEnum{
+    where
+        ET: HasGLEnum,
+    {
         let mut r = Self::new();
         r.upload_data_to_bound_texture(size, data, format)?;
         Some(r)
@@ -114,7 +116,9 @@ impl Texture2D {
         data: &[ET],
         format: GLenum,
     ) -> Option<()>
-    where ET: HasGLEnum{
+    where
+        ET: HasGLEnum,
+    {
         let l: u32 = unwrap_or_ret_none!(data.len().try_into());
         let (internal_fmt, cpp) = crate::format_to_gl_internal_format(
             (std::mem::size_of::<ET>() * 8).try_into().unwrap(),
@@ -151,7 +155,9 @@ impl Texture2DArray {
         data: &[ET],
         format: GLenum,
     ) -> Option<()>
-    where ET: HasGLEnum{
+    where
+        ET: HasGLEnum,
+    {
         let l: u32 = unwrap_or_ret_none!(data.len().try_into());
         let (internal_fmt, cpp) = crate::format_to_gl_internal_format(
             (std::mem::size_of::<ET>() * 8).try_into().unwrap(),
@@ -189,7 +195,9 @@ impl Texture3D {
         data: &[ET],
         format: GLenum,
     ) -> Option<()>
-    where ET: HasGLEnum{
+    where
+        ET: HasGLEnum,
+    {
         let l: u32 = unwrap_or_ret_none!(data.len().try_into());
         let (internal_fmt, cpp) = crate::format_to_gl_internal_format(
             (std::mem::size_of::<ET>() * 8).try_into().unwrap(),
