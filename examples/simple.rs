@@ -6,6 +6,7 @@ use gl_wrapper::render::texture::TextureFunc;
 use gl_wrapper::render::*;
 use gl_wrapper::util::buffer_obj::BOFunc;
 use gl_wrapper::util::*;
+use gl_wrapper::HasGLEnum;
 
 use glutin::dpi::PhysicalSize;
 use std::convert::TryInto;
@@ -137,11 +138,10 @@ fn main() {
         .get_size()
         .try_into()
         .expect("The number of triangles you have is either negative, or too big!");
-    let ibo_enum_type = gl_wrapper::type_to_gl_enum::<GLushort>().unwrap();
     let mut t = Instant::now();
     // Note we use run-return to make sure that everything gets dropped ( although run also works )
     events_loop.run_return(|event, _, control_flow| {
-        // Unless we re write the control flow just wait until another evetn arrives when this iteration finished
+        // Unless we rewrite the control flow just wait until another evetn arrives when this iteration finished
         *control_flow = ControlFlow::Poll;
         match event {
             // Window stuff
@@ -149,7 +149,6 @@ fn main() {
                 match event {
                     WindowEvent::Resized(PhysicalSize { width, height }) => {
                         gl_wrapper::set_gl_draw_size(width, height);
-                        //render();
                     }
                     WindowEvent::CloseRequested => *control_flow = ControlFlow::Exit,
                     WindowEvent::KeyboardInput {
@@ -169,7 +168,7 @@ fn main() {
                 if 1.0 / (t.elapsed().as_secs_f32()) < 61.0 {
                     unsafe {
                         gl::Clear(gl::COLOR_BUFFER_BIT);
-                        gl::DrawElements(gl::TRIANGLES, ibo_len, ibo_enum_type, ptr::null());
+                        gl::DrawElements(gl::TRIANGLES, ibo_len, GLushort::get_gl_enum(), ptr::null());
                     }
                     gl_window.swap_buffers().unwrap();
                     t = Instant::now();

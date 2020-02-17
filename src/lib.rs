@@ -1,7 +1,6 @@
 use gl::types::*;
 use glutin::PossiblyCurrent;
 use glutin::{NotCurrent, WindowedContext};
-use std::any::TypeId;
 use std::convert::TryInto;
 use std::ffi::CStr;
 
@@ -56,26 +55,44 @@ pub fn set_gl_draw_size(w: u32, h: u32) -> Option<()> {
     Some(())
 }
 
-pub fn type_to_gl_enum<T>() -> Option<GLenum>
-    where T: 'static{
-        if TypeId::of::<T>() == TypeId::of::<GLfloat>() {
-            Some(gl::FLOAT)
-        } else if TypeId::of::<T>() == TypeId::of::<GLint>() {
-            Some(gl::INT)
-        } else if TypeId::of::<T>() == TypeId::of::<GLuint>() {
-            Some(gl::UNSIGNED_INT)
-        } else if TypeId::of::<T>() == TypeId::of::<GLshort>() {
-            Some(gl::SHORT)
-        } else if TypeId::of::<T>() == TypeId::of::<GLushort>() {
-            Some(gl::UNSIGNED_SHORT)
-        } else if TypeId::of::<T>() == TypeId::of::<GLubyte>() {
-            Some(gl::UNSIGNED_BYTE)
-        } else if TypeId::of::<T>() == TypeId::of::<GLbyte>() {
-            Some(gl::BYTE)
-        } else {
-            None
-        }
+pub trait HasGLEnum{
+    fn get_gl_enum() -> GLenum;
 }
+
+impl HasGLEnum for GLfloat{
+    #[inline(always)]
+    fn get_gl_enum() -> GLenum { gl::FLOAT }
+}
+
+impl HasGLEnum for GLint{
+    #[inline(always)]
+    fn get_gl_enum() -> GLenum { gl::INT }
+}
+impl HasGLEnum for GLuint{
+    #[inline(always)]
+    fn get_gl_enum() -> GLenum{ gl::UNSIGNED_INT }
+}
+
+impl HasGLEnum for GLshort{
+    #[inline(always)]
+    fn get_gl_enum() -> GLenum { gl::SHORT }
+}
+
+impl HasGLEnum for GLushort{
+    #[inline(always)]
+    fn get_gl_enum() -> GLenum { gl::UNSIGNED_SHORT }
+}
+
+impl HasGLEnum for GLubyte{
+    #[inline(always)]
+    fn get_gl_enum() -> GLenum { gl::UNSIGNED_BYTE }
+}
+
+impl HasGLEnum for GLbyte{
+    #[inline(always)]
+    fn get_gl_enum() -> GLenum { gl::BYTE }
+}
+
 
 #[inline]
 pub fn shader_glenum_to_string(e: GLenum) -> Option<&'static str> {

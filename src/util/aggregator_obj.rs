@@ -3,6 +3,7 @@ use std::ptr;
 
 use crate::render::program;
 use crate::util::buffer_obj;
+use crate::HasGLEnum;
 
 pub struct VAO {
     id: GLuint,
@@ -56,18 +57,12 @@ impl VAO {
         bo: &buffer_obj::VBO<ET>,
         index: GLuint,
     ) -> Result<(), &'static str>
-    where ET: 'static{
+    where ET: HasGLEnum{
         unsafe {
-            let t = match crate::type_to_gl_enum::<ET>() {
-                Some(r) => r,
-                None => {
-                    return Err("Invalid type for buffer data (a.k.a the type of the elements of the buffer you just passed me is not supported)");
-                }
-            };
             gl::VertexAttribPointer(
                 index,
                 bo.get_elem_per_vertex().into(),
-                t,
+                ET::get_gl_enum(),
                 gl::FALSE,
                 0,
                 ptr::null(),

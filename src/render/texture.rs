@@ -1,4 +1,4 @@
-use crate::unwrap_or_ret_none;
+use crate::{unwrap_or_ret_none, HasGLEnum};
 use gl::types::*;
 use std::convert::TryInto;
 
@@ -102,7 +102,7 @@ impl Texture2D {
     }
 
     pub fn with_data<ET>(size: [u32; 2], data: &[ET], format: GLenum) -> Option<Self>
-    where ET: 'static{
+    where ET: HasGLEnum{
         let mut r = Self::new();
         r.upload_data_to_bound_texture(size, data, format)?;
         Some(r)
@@ -114,7 +114,7 @@ impl Texture2D {
         data: &[ET],
         format: GLenum,
     ) -> Option<()>
-    where ET: 'static{
+    where ET: HasGLEnum{
         let l: u32 = unwrap_or_ret_none!(data.len().try_into());
         let (internal_fmt, cpp) = crate::format_to_gl_internal_format(
             (std::mem::size_of::<ET>() * 8).try_into().unwrap(),
@@ -132,7 +132,7 @@ impl Texture2D {
                 unwrap_or_ret_none!(size[1].try_into()),
                 0,
                 format,
-                crate::type_to_gl_enum::<ET>()?,
+                ET::get_gl_enum(),
                 &data[0] as *const ET as *const std::ffi::c_void,
             );
         }
@@ -151,7 +151,7 @@ impl Texture2DArray {
         data: &[ET],
         format: GLenum,
     ) -> Option<()>
-    where ET: 'static{
+    where ET: HasGLEnum{
         let l: u32 = unwrap_or_ret_none!(data.len().try_into());
         let (internal_fmt, cpp) = crate::format_to_gl_internal_format(
             (std::mem::size_of::<ET>() * 8).try_into().unwrap(),
@@ -170,7 +170,7 @@ impl Texture2DArray {
                 unwrap_or_ret_none!(size[2].try_into()),
                 0,
                 format,
-                crate::type_to_gl_enum::<ET>()?,
+                ET::get_gl_enum(),
                 &data[0] as *const ET as *const std::ffi::c_void,
             );
         }
@@ -189,7 +189,7 @@ impl Texture3D {
         data: &[ET],
         format: GLenum,
     ) -> Option<()>
-    where ET: 'static{
+    where ET: HasGLEnum{
         let l: u32 = unwrap_or_ret_none!(data.len().try_into());
         let (internal_fmt, cpp) = crate::format_to_gl_internal_format(
             (std::mem::size_of::<ET>() * 8).try_into().unwrap(),
@@ -208,7 +208,7 @@ impl Texture3D {
                 unwrap_or_ret_none!(size[2].try_into()),
                 0,
                 format,
-                crate::type_to_gl_enum::<ET>()?,
+                ET::get_gl_enum(),
                 &data[0] as *const ET as *const std::ffi::c_void,
             );
         }
