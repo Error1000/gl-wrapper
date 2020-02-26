@@ -17,6 +17,16 @@ macro_rules! unwrap_or_ret_none {
     };
 }
 
+#[macro_export]
+macro_rules! unwrap_option_or_ret {
+    ($x:expr, $y:expr) => {
+        match $x {
+            Some(val) => val,
+            None => return $y,
+        }
+    }
+}
+
 // NOTE about design: To future self never have getters that get a mutable self reference or return a mutable reference to a value no matter what
 #[inline]
 pub fn get_gl_version_str() -> String {
