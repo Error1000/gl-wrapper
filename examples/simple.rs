@@ -81,7 +81,7 @@ fn main() {
     };
 
     program.bind_program();
-    // TODO: Maybe add a load_attributes/uniforms to programs to make loading a lot of these vars at once easier
+    // TODO: Add an auto_load_all() function
     program
         .load_attribute("position")
         .expect("Failed to load attribute from shader!");

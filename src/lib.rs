@@ -54,55 +54,55 @@ pub fn set_gl_draw_size(w: u32, h: u32) -> Option<()> {
     }
     Some(())
 }
-
+// Since this is a pub trait if somebody decides to implement HasGLEnum for their own type and get the enum worng this would allow for a buffer overflow/underflow in all functions relying on this without using unsafe in the cde you have written this makes sure that that will never happen without using unsafe at least once in your code
 pub trait HasGLEnum {
-    fn get_gl_enum() -> GLenum;
+    unsafe fn get_gl_enum() -> GLenum;
 }
 
 impl HasGLEnum for GLfloat {
     #[inline(always)]
-    fn get_gl_enum() -> GLenum {
+    unsafe fn get_gl_enum() -> GLenum {
         gl::FLOAT
     }
 }
 
 impl HasGLEnum for GLint {
     #[inline(always)]
-    fn get_gl_enum() -> GLenum {
+    unsafe fn get_gl_enum() -> GLenum {
         gl::INT
     }
 }
 impl HasGLEnum for GLuint {
     #[inline(always)]
-    fn get_gl_enum() -> GLenum {
+    unsafe fn get_gl_enum() -> GLenum {
         gl::UNSIGNED_INT
     }
 }
 
 impl HasGLEnum for GLshort {
     #[inline(always)]
-    fn get_gl_enum() -> GLenum {
+    unsafe fn get_gl_enum() -> GLenum {
         gl::SHORT
     }
 }
 
 impl HasGLEnum for GLushort {
     #[inline(always)]
-    fn get_gl_enum() -> GLenum {
+    unsafe fn get_gl_enum() -> GLenum {
         gl::UNSIGNED_SHORT
     }
 }
 
 impl HasGLEnum for GLubyte {
     #[inline(always)]
-    fn get_gl_enum() -> GLenum {
+    unsafe fn get_gl_enum() -> GLenum {
         gl::UNSIGNED_BYTE
     }
 }
 
 impl HasGLEnum for GLbyte {
     #[inline(always)]
-    fn get_gl_enum() -> GLenum {
+    unsafe fn get_gl_enum() -> GLenum {
         gl::BYTE
     }
 }
