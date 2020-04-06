@@ -113,12 +113,12 @@ fn main() {
     let mut a = aggregator_obj::VAO::new();
     a.bind_vao_for_data();
 
-    let pos_vbo = buffer_obj::VBO::<GLfloat>::with_data(2, &VERTEX_DATA, gl::STATIC_DRAW)
+    let pos_vbo = buffer_obj::VBO::<GLfloat>::with_data(&[2], &VERTEX_DATA, gl::STATIC_DRAW)
         .expect("Failed to upload data to vbo!");
     a.attach_bound_vbo_to_bound_vao(&pos_vbo, program.get_attribute_id("position"), 0)
         .expect("Failed to attach vob to vao!");
 
-    let tex_vbo = buffer_obj::VBO::<GLfloat>::with_data(2, &TEX_DATA, gl::STATIC_DRAW)
+    let tex_vbo = buffer_obj::VBO::<GLfloat>::with_data(&[2], &TEX_DATA, gl::STATIC_DRAW)
         .expect("Failed to upload data to vbo!");
     a.attach_bound_vbo_to_bound_vao(&tex_vbo, program.get_attribute_id("tex_coord"), 0)
         .expect("Failed to attach vbo to vao!");

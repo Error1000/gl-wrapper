@@ -35,28 +35,30 @@ impl<ET> Drop for BOBase<ET> {
     }
 }
 
-pub struct VBO<ET>(BOBase<ET>, u8);
+pub struct VBO<'a, ET>(BOBase<ET>, &'a [u8]);
 pub struct IBO<ET>(BOBase<ET>);
 
-impl<ET> VBO<ET> {
-    pub fn new(elem_per_vert: u8) -> Self {
+impl<'a, ET> VBO<'a, ET> {
+    pub fn new(elem_per_vert: &'a [u8]) -> Self {
         VBO::<ET>(BOBase::<ET>::new(), elem_per_vert)
     }
 
-    pub fn with_data(elem_per_vert: u8, data: &[ET], usage: GLenum) -> Option<Self> {
+    pub fn with_data(elem_per_vert: &'a [u8], data: &[ET], usage: GLenum) -> Option<Self> {
         let mut r = Self::new(elem_per_vert);
         r.bind_bo();
         r.upload_to_bound_bo(data, usage)?;
         Some(r)
     }
 
-    pub fn get_elem_per_vertex(self: &Self) -> u8 {
+    pub fn get_elem_per_vertex(self: &Self) -> &'a [u8] {
         self.1
     }
 
     // NOTE: This dosen't just return a value it uses two values already in the struct to get this value so it's not as lightweight as other getters
     pub fn get_num_of_vertices(self: &Self) -> isize {
-        self.get_size() / isize::from(self.get_elem_per_vertex())
+        let mut sum: isize = 0;
+        for e in self.get_elem_per_vertex(){ sum += isize::from(*e); }
+        self.get_size() / isize::from(sum)
     }
 
     pub fn upload_to_bound_bo(self: &mut Self, data: &[ET], usage: GLenum) -> Option<()> {
@@ -109,7 +111,7 @@ pub trait BOFunc<ET> {
     fn get_type() -> GLenum;
 }
 
-impl<ET> BOFunc<ET> for VBO<ET> {
+impl<'a, ET> BOFunc<ET> for VBO<'a, ET> {
     #[inline]
     fn get_size(self: &Self) -> isize {
         self.get_bo_base().size

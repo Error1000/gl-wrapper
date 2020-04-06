@@ -53,23 +53,26 @@ impl VAO {
         }
         Some(())
     }
-
+    //TODO: Rework
     pub fn attach_bound_vbo_to_bound_vao<ET>(
         self: &mut Self,
         bo: &buffer_obj::VBO<ET>,
         index: GLuint,
-        stride: GLsizei,
+        stride: usize,
     ) -> Result<(), &'static str>
     where
         ET: HasGLEnum,
     {
+        let mut sum: i32 = 0;
+        for i in 0..stride { sum += i32::from(bo.get_elem_per_vertex()[i]); }
+
         unsafe {
             gl::VertexAttribPointer(
                 index,
-                bo.get_elem_per_vertex().into(),
+                bo.get_elem_per_vertex()[stride].into(),
                 ET::get_gl_enum(),
                 gl::FALSE,
-                stride * GLsizei::try_from(size_of::<ET>()).expect("Type too big for vbo!!!"),
+                sum * i32::try_from(size_of::<ET>()).expect("Type too big for vbo!!!"),
                 ptr::null(),
             );
         }
