@@ -115,12 +115,12 @@ fn main() {
 
     let pos_vbo = buffer_obj::VBO::<GLfloat>::with_data(2, &VERTEX_DATA, gl::STATIC_DRAW)
         .expect("Failed to upload data to vbo!");
-    a.attach_bound_vbo_to_bound_vao(&pos_vbo, program.get_attribute_id("position"))
+    a.attach_bound_vbo_to_bound_vao(&pos_vbo, program.get_attribute_id("position"), 0)
         .expect("Failed to attach vob to vao!");
 
     let tex_vbo = buffer_obj::VBO::<GLfloat>::with_data(2, &TEX_DATA, gl::STATIC_DRAW)
         .expect("Failed to upload data to vbo!");
-    a.attach_bound_vbo_to_bound_vao(&tex_vbo, program.get_attribute_id("tex_coord"))
+    a.attach_bound_vbo_to_bound_vao(&tex_vbo, program.get_attribute_id("tex_coord"), 0)
         .expect("Failed to attach vbo to vao!");
 
     a.bind_vao_for_program(&program).expect("Shader is asking for more values than vao has attached, all attributes the shader uses must be attached to vao!");

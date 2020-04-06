@@ -4,6 +4,8 @@ use std::ptr;
 use crate::render::program;
 use crate::util::buffer_obj;
 use crate::HasGLEnum;
+use std::mem::size_of;
+use std::convert::TryFrom;
 
 pub struct VAO {
     id: GLuint,
@@ -56,6 +58,7 @@ impl VAO {
         self: &mut Self,
         bo: &buffer_obj::VBO<ET>,
         index: GLuint,
+        stride: GLsizei,
     ) -> Result<(), &'static str>
     where
         ET: HasGLEnum,
@@ -66,7 +69,7 @@ impl VAO {
                 bo.get_elem_per_vertex().into(),
                 ET::get_gl_enum(),
                 gl::FALSE,
-                0,
+                stride * GLsizei::try_from(size_of::<ET>()).expect("Type too big for vbo!!!"),
                 ptr::null(),
             );
         }
