@@ -56,15 +56,15 @@ pub trait TextureFunc {
         }
     }
 
-    fn set_min_filter_of_bound_tex(self: &mut Self, min_filter: GLint) {
+    fn set_min_filter_of_bound_tex(self: &mut Self, min_filter: GLuint) {
         unsafe {
-            gl::TexParameteri(Self::get_type(), gl::TEXTURE_MIN_FILTER, min_filter);
+            gl::TexParameteri(Self::get_type(), gl::TEXTURE_MIN_FILTER, min_filter.try_into().expect("FATAL Failure, faulty opengl implementation!"));
         }
     }
 
-    fn set_mag_filter_of_bound_tex(self: &mut Self, mag_filter: GLint) {
+    fn set_mag_filter_of_bound_tex(self: &mut Self, mag_filter: GLuint) {
         unsafe {
-            gl::TexParameteri(Self::get_type(), gl::TEXTURE_MAG_FILTER, mag_filter);
+            gl::TexParameteri(Self::get_type(), gl::TEXTURE_MAG_FILTER, mag_filter.try_into().expect("FATAL Failure, faulty opengl implementation!"));
         }
     }
 

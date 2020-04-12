@@ -4,13 +4,7 @@
     <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="efb3930f-a966-48e8-a961-4513db482a27" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Cargo.lock" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/examples/simple.rs" beforeDir="false" afterPath="$PROJECT_DIR$/examples/simple.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/util/aggregator_obj.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/util/aggregator_obj.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/util/buffer_obj.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/util/buffer_obj.rs" afterDir="false" />
-    </list>
+    <list default="true" id="efb3930f-a966-48e8-a961-4513db482a27" name="Default Changelist" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -39,7 +33,7 @@
   <component name="PropertiesComponent">
     <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../gl-puck" />
     <property name="org.rust.cargo.project.model.PROJECT_DISCOVERY" value="true" />
     <property name="org.rust.hideDetachedFileNotifications/home/dan/Documents/Coding/Rust/OpenGLWrapper/src/util/mod.rs" value="true" />
     <property name="org.rust.hideDetachedFileNotifications/home/dan/Documents/Coding/Rust/gl-wrapper/src/API.rs" value="true" />
@@ -275,26 +269,26 @@
       <screen x="0" y="0" width="1920" height="1051" />
     </state>
     <state x="788" y="93" width="764" height="805" key="CommitChangelistDialog2/0.0.1920.1051@0.0.1920.1051" timestamp="1581936049415" />
-    <state x="743" y="284" width="428" height="484" key="FileChooserDialogImpl" timestamp="1586204504184">
+    <state x="743" y="284" width="428" height="484" key="FileChooserDialogImpl" timestamp="1586205802282">
       <screen x="0" y="0" width="1920" height="1051" />
     </state>
-    <state x="743" y="284" width="428" height="484" key="FileChooserDialogImpl/0.0.1920.1051@0.0.1920.1051" timestamp="1586204504184" />
-    <state width="1878" height="275" key="GridCell.Tab.0.bottom" timestamp="1586205733086">
+    <state x="743" y="284" width="428" height="484" key="FileChooserDialogImpl/0.0.1920.1051@0.0.1920.1051" timestamp="1586205802282" />
+    <state width="1878" height="275" key="GridCell.Tab.0.bottom" timestamp="1586205802297">
       <screen x="0" y="0" width="1920" height="1051" />
     </state>
-    <state width="1878" height="275" key="GridCell.Tab.0.bottom/0.0.1920.1051@0.0.1920.1051" timestamp="1586205733086" />
-    <state width="1878" height="275" key="GridCell.Tab.0.center" timestamp="1586205733085">
+    <state width="1878" height="275" key="GridCell.Tab.0.bottom/0.0.1920.1051@0.0.1920.1051" timestamp="1586205802297" />
+    <state width="1878" height="275" key="GridCell.Tab.0.center" timestamp="1586205802297">
       <screen x="0" y="0" width="1920" height="1051" />
     </state>
-    <state width="1878" height="275" key="GridCell.Tab.0.center/0.0.1920.1051@0.0.1920.1051" timestamp="1586205733085" />
-    <state width="1878" height="275" key="GridCell.Tab.0.left" timestamp="1586205733085">
+    <state width="1878" height="275" key="GridCell.Tab.0.center/0.0.1920.1051@0.0.1920.1051" timestamp="1586205802297" />
+    <state width="1878" height="275" key="GridCell.Tab.0.left" timestamp="1586205802297">
       <screen x="0" y="0" width="1920" height="1051" />
     </state>
-    <state width="1878" height="275" key="GridCell.Tab.0.left/0.0.1920.1051@0.0.1920.1051" timestamp="1586205733085" />
-    <state width="1878" height="275" key="GridCell.Tab.0.right" timestamp="1586205733086">
+    <state width="1878" height="275" key="GridCell.Tab.0.left/0.0.1920.1051@0.0.1920.1051" timestamp="1586205802297" />
+    <state width="1878" height="275" key="GridCell.Tab.0.right" timestamp="1586205802297">
       <screen x="0" y="0" width="1920" height="1051" />
     </state>
-    <state width="1878" height="275" key="GridCell.Tab.0.right/0.0.1920.1051@0.0.1920.1051" timestamp="1586205733086" />
+    <state width="1878" height="275" key="GridCell.Tab.0.right/0.0.1920.1051@0.0.1920.1051" timestamp="1586205802297" />
     <state x="506" y="151" key="SettingsEditor" timestamp="1581243076011">
       <screen x="0" y="0" width="1920" height="1051" />
     </state>
