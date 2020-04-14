@@ -219,12 +219,12 @@ impl Program {
 
     #[inline]
     pub fn get_uniform_id(self: &Self, name: &'static str) -> Option<GLuint> {
-        self.uniform_ids.get(name)
+        self.uniform_ids.get(name).cloned()
     }
 
     #[inline]
     pub fn get_attribute_id(self: &Self, name: &'static str) -> Option<GLuint> {
-        self.attrib_ids.get(name)
+        self.attrib_ids.get(name).cloned()
     }
 
     #[inline]
