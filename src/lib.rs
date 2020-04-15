@@ -8,11 +8,11 @@ pub mod render;
 pub mod util;
 
 #[macro_export]
-macro_rules! unwrap_or_ret_none {
-    ($x:expr) => {
+macro_rules! unwrap_result_or_ret {
+    ($x:expr, $y:expr) => {
         match $x {
             Ok(val) => val,
-            Err(_) => return None,
+            Err(_) => return $y,
         }
     };
 }
@@ -26,6 +26,8 @@ macro_rules! unwrap_option_or_ret {
         }
     }
 }
+
+
 
 // NOTE about design: To future self never have getters that get a mutable self reference or return a mutable reference to a value no matter what
 #[inline]
@@ -53,16 +55,16 @@ pub fn set_gl_clear_color(r: f32, g: f32, b: f32, a: f32) {
 }
 
 #[inline]
-pub fn set_gl_draw_size(w: u32, h: u32) -> Option<()> {
+pub fn set_gl_draw_size(w: u32, h: u32) -> Result<(), &'static str> {
     unsafe {
         gl::Viewport(
             0,
             0,
-            unwrap_or_ret_none!(w.try_into()),
-            unwrap_or_ret_none!(h.try_into()),
+            unwrap_result_or_ret!(w.try_into(), Err("Size of canvas too big for opengl!")),
+            unwrap_result_or_ret!(h.try_into(), Err("Size of canvas too big for opengl!")),
         );
     }
-    Some(())
+    Ok(())
 }
 // Since this is a pub trait if somebody decides to implement HasGLEnum for their own type and get the enum worng this would allow for a buffer overflow/underflow in all functions relying on this without using unsafe in the cde you have written this makes sure that that will never happen without using unsafe at least once in your code
 pub trait HasGLEnum {
@@ -128,7 +130,7 @@ pub fn shader_glenum_to_string(e: GLenum) -> Option<&'static str> {
 }
 
 pub fn init(win: WindowedContext<NotCurrent>) -> Option<WindowedContext<PossiblyCurrent>> {
-    let w = unwrap_or_ret_none!(unsafe { win.make_current() });
+    let w = unwrap_result_or_ret!(unsafe { win.make_current() }, None);
     gl::load_with(|symbol| w.get_proc_address(symbol));
     unsafe {
         gl::Enable(gl::BLEND);

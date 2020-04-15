@@ -1,8 +1,8 @@
 use crate::render::shader::*;
-use crate::unwrap_or_ret_none;
+use crate::unwrap_result_or_ret;
 use gl::types::*;
 use std::collections::HashMap;
-use std::convert::TryInto;
+use std::convert::{TryInto, TryFrom};
 use std::ffi::CString;
 use std::ptr;
 use std::str;
@@ -11,8 +11,8 @@ pub struct Program {
     id: GLuint,
     /// TODO: Maybe optimise this as realistically there aren't going to be more than 100 entries
     /// in either of these hash maps so the 1 in O(1) becomes pretty big
-    uniform_ids: HashMap<&'static str, GLuint>,
-    attrib_ids: HashMap<&'static str, GLuint>,
+    uniform_ids: HashMap<String, GLuint>,
+    attrib_ids: HashMap<String, GLuint>,
 }
 
 impl Drop for Program {
@@ -86,40 +86,76 @@ impl Program {
     #[inline(always)]
     fn get_id_of(
         self: &Self,
-        name: &'static str,
+        name: &str,
         get_location: unsafe fn(GLuint, *const GLchar) -> GLint,
-    ) -> Option<u32> {
+    ) -> Result<u32, &str> {
         let id = {
-            let cname = unwrap_or_ret_none!(CString::new(name.as_bytes()));
+            let cname = unwrap_result_or_ret!(CString::new(name.as_bytes()), Err("Invalid name!"));
             unsafe { get_location(self.id, cname.as_ptr() as *const GLchar) }
         };
         if id < 0 {
-            return None;
+            return Err("Could not find id!");
         }
-        let id: u32 = unwrap_or_ret_none!(id.try_into());
-        Some(id)
+        let id: u32 = unwrap_result_or_ret!(id.try_into(), Err("Id returned from opengl is too big to fit in return type, faulty opengl implementation!"));
+        Ok(id)
     }
 
-    pub fn load_uniform(self: &mut Self, name: &'static str) -> Option<()> {
+    pub fn load_uniform(self: &mut Self, name: String) -> Result<(), String> {
         // Check if already loaded, glGetUniformLocation can be pretty damn slow and a simple contains_key, especially on a hashbrown is probablly way faster
-        if !self.uniform_ids.contains_key(name) {
-            let u_id = self.get_id_of(name, gl::GetUniformLocation)?;
+        if !self.uniform_ids.contains_key(&name) {
+            let u_id = self.get_id_of(&name, gl::GetUniformLocation)?;
             self.uniform_ids.insert(name, u_id);
         }
-        Some(())
+        Ok(())
     }
 
-    pub fn load_sampler(self: &mut Self, name: &'static str) -> Option<()> {
+    pub fn load_sampler(self: &mut Self, name: String) -> Result<(), String> {
         self.load_uniform(name)
     }
 
-    pub fn load_attribute(self: &mut Self, name: &'static str) -> Option<()> {
+    pub fn load_attribute(self: &mut Self, name: String) -> Result<(), String>{
         // Check if already loaded, glGetUniformLocation can be pretty damn slow and a simple contains_key, especially on a hashbrown is probably way faster
-        if !self.attrib_ids.contains_key(name) {
-            let a_id = self.get_id_of(name, gl::GetAttribLocation)?;
+        if !self.attrib_ids.contains_key(&name) {
+            let a_id = self.get_id_of(&name, gl::GetAttribLocation)?;
             self.attrib_ids.insert(name, a_id);
         }
-        Some(())
+        Ok(())
+    }
+
+    /// Warning: Does NOT support arrays of uniforms/attributes/samplers!
+    pub fn auto_load_all(self: &mut Self, buf_size: GLushort) -> Result<(), String>{
+           let mut count: GLint = 0;
+            let mut name = vec![0_u8; buf_size.into()];
+
+            unsafe{ gl::GetProgramiv(self.id, gl::ACTIVE_ATTRIBUTES, &mut count) };
+            let count = unwrap_result_or_ret!(GLuint::try_from(count), Err(format!("Invalid number of attributes: {}", count)));
+            for i in 0..count {
+                let nam: &[u8] = {
+                    let mut typ: GLenum = 0;
+                    let mut siz: GLint = 0;
+                    let mut actual_len: GLsizei = 0;
+                    unsafe{ gl::GetActiveAttrib(self.id, unwrap_result_or_ret!(i.try_into(), Err(format!("Invalid attribute id: {}", i))), buf_size.into(), &mut actual_len, &mut siz, &mut typ, name.as_mut_ptr() as *mut GLchar) };
+                    &name[0..unwrap_result_or_ret!(actual_len.try_into(), Err("Opengl returned negative name size for attribute, faulty opengl implementation!".to_owned()))]
+                };
+                self.attrib_ids.insert(String::from(unwrap_result_or_ret!(str::from_utf8(nam), Err(format!("Invalid attribute name: {:?}", nam)))), i);
+            }
+
+        let mut count: GLint = 0;
+
+        unsafe{ gl::GetProgramiv(self.id, gl::ACTIVE_UNIFORMS, &mut count) };
+        let count = unwrap_result_or_ret!(GLuint::try_from(count), Err(format!("Invalid number of uniforms: {}", count)));
+        for i in 0..count {
+            let nam: &[u8] = {
+                let mut typ: GLenum = 0;
+                let mut siz: GLint = 0;
+                let mut actual_len: GLsizei = 0;
+                unsafe{ gl::GetActiveUniform(self.id, unwrap_result_or_ret!(i.try_into(), Err(format!("Invalid uniform id: {}", i))), buf_size.into(), &mut actual_len, &mut siz, &mut typ, name.as_mut_ptr() as *mut GLchar) };
+                &name[0..unwrap_result_or_ret!(actual_len.try_into(), Err("Opengl returned negative name size for uniform, faulty opengl implementation!".to_owned()))]
+            };
+            self.uniform_ids.insert(String::from(unwrap_result_or_ret!(str::from_utf8(nam), Err(format!("Invalid attribute name: {:?}", nam)))), i);
+        }
+
+        Ok(())
     }
 
     #[inline]
@@ -127,6 +163,8 @@ impl Program {
         self.uniform_ids.clear();
         self.attrib_ids.clear();
     }
+
+
 
     #[inline]
     pub fn set_uniform_i32(self: &mut Self, id: GLint, val: i32) {
@@ -205,30 +243,31 @@ impl Program {
         }
     }
 
+
+
+
     #[inline]
-    pub fn get_attribute_hashmap(self: &Self) -> &HashMap<&'static str, GLuint> {
+    pub fn get_attribute_hashmap(self: &Self) -> &HashMap<String, GLuint> {
         &self.attrib_ids
     }
 
     #[inline]
-    pub fn get_uniform_hashmap(self: &Self) -> &HashMap<&'static str, GLuint> {
+    pub fn get_uniform_hashmap(self: &Self) -> &HashMap<String, GLuint> {
         &self.uniform_ids
     }
 
-    /// I know unsafe is not a good idea but the code bloat is pretty big plus the only error that these functions can cause is either because memory corruption or bad usage of the api that could lead to undefined behaviour plus if the user really wants they can catch the unwrap soo, i'm sorry
-
     #[inline]
-    pub fn get_uniform_id(self: &Self, name: &'static str) -> Option<GLuint> {
+    pub fn get_uniform_id(self: &Self, name: &str) -> Option<GLuint> {
         self.uniform_ids.get(name).cloned()
     }
 
     #[inline]
-    pub fn get_attribute_id(self: &Self, name: &'static str) -> Option<GLuint> {
+    pub fn get_attribute_id(self: &Self, name: &str) -> Option<GLuint> {
         self.attrib_ids.get(name).cloned()
     }
 
     #[inline]
-    pub fn get_sampler_id(self: &Self, name: &'static str) -> Option<GLuint> {
+    pub fn get_sampler_id(self: &Self, name: &str) -> Option<GLuint> {
         self.get_uniform_id(name)
     }
 }

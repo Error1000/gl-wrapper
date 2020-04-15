@@ -1,4 +1,4 @@
-use crate::unwrap_or_ret_none;
+use crate::unwrap_result_or_ret;
 use gl::types::*;
 use std::convert::TryFrom;
 use std::marker::PhantomData;
@@ -43,11 +43,11 @@ impl<'a, ET> VBO<'a, ET> {
         VBO::<ET>(BOBase::<ET>::new(), elem_per_vert)
     }
 
-    pub fn with_data(elem_per_vert: &'a [u8], data: &[ET], usage: GLenum) -> Option<Self> {
+    pub fn with_data(elem_per_vert: &'a [u8], data: &[ET], usage: GLenum) -> Result<Self, String> {
         let mut r = Self::new(elem_per_vert);
         r.bind_bo();
         r.upload_to_bound_bo(data, usage)?;
-        Some(r)
+        Ok(r)
     }
 
     pub fn get_elem_per_vertex(self: &Self) -> &'a [u8] {
@@ -61,17 +61,17 @@ impl<'a, ET> VBO<'a, ET> {
         self.get_size() / isize::from(sum)
     }
 
-    pub fn upload_to_bound_bo(self: &mut Self, data: &[ET], usage: GLenum) -> Option<()> {
-        self.0.size = unwrap_or_ret_none!(isize::try_from(data.len()));
+    pub fn upload_to_bound_bo(self: &mut Self, data: &[ET], usage: GLenum) -> Result<(), String> {
+        self.0.size = unwrap_result_or_ret!(isize::try_from(data.len()), Err("Size of data too big for opengl!".to_owned()));
         unsafe {
             gl::BufferData(
                 Self::get_type(),
-                self.get_size() * unwrap_or_ret_none!(isize::try_from(size_of::<ET>())),
+                self.get_size() * unwrap_result_or_ret!(isize::try_from(size_of::<ET>()), Err("Invalid size of data type, how even?".to_owned())),
                 &data[0] as *const ET as *const std::ffi::c_void,
                 usage,
             );
         }
-        Some(())
+        Ok(())
     }
 }
 
@@ -80,24 +80,24 @@ impl<ET> IBO<ET> {
         IBO::<ET>(BOBase::<ET>::new())
     }
 
-    pub fn with_data(data: &[ET], usage: GLenum) -> Option<Self> {
+    pub fn with_data(data: &[ET], usage: GLenum) -> Result<Self, String> {
         let mut r = Self::new();
         r.bind_bo();
         r.upload_to_bound_bo(data, usage)?;
-        Some(r)
+        Ok(r)
     }
 
-    pub fn upload_to_bound_bo(self: &mut Self, data: &[ET], usage: GLenum) -> Option<()> {
-        self.0.size = unwrap_or_ret_none!(isize::try_from(data.len()));
+    pub fn upload_to_bound_bo(self: &mut Self, data: &[ET], usage: GLenum) -> Result<(), String> {
+        self.0.size = unwrap_result_or_ret!(isize::try_from(data.len()), Err("Size of data is too big for opengl!".to_owned()));
         unsafe {
             gl::BufferData(
                 Self::get_type(),
-                self.get_size() * unwrap_or_ret_none!(isize::try_from(size_of::<ET>())),
+                self.get_size() * unwrap_result_or_ret!(isize::try_from(size_of::<ET>()), Err("Invalid size of data type, how even?".to_owned())),
                 &data[0] as *const ET as *const std::ffi::c_void,
                 usage,
             );
         }
-        Some(())
+        Ok(())
     }
 }
 

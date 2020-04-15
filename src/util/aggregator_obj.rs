@@ -6,6 +6,7 @@ use crate::util::buffer_obj;
 use crate::HasGLEnum;
 use std::mem::size_of;
 use std::convert::TryFrom;
+use crate::unwrap_result_or_ret;
 
 pub struct VAO {
     id: GLuint,
@@ -59,7 +60,7 @@ impl VAO {
         bo: &buffer_obj::VBO<ET>,
         index: GLuint,
         stride: usize,
-    ) -> Result<(), &'static str>
+    ) -> Result<(), String>
     where
         ET: HasGLEnum,
     {
@@ -72,7 +73,7 @@ impl VAO {
                 bo.get_elem_per_vertex()[stride].into(),
                 ET::get_gl_enum(),
                 gl::FALSE,
-                sum * i32::try_from(size_of::<ET>()).expect("Type too big for vbo!!!"),
+                sum * unwrap_result_or_ret!(i32::try_from(size_of::<ET>()), Err("Type too big for opengl!".to_owned())),
                 ptr::null(),
             );
         }

@@ -1,6 +1,8 @@
-use crate::{unwrap_or_ret_none, HasGLEnum};
+use crate::HasGLEnum;
 use gl::types::*;
 use std::convert::TryInto;
+use crate::unwrap_result_or_ret;
+use crate::unwrap_option_or_ret;
 
 pub struct TextureBase {
     id: GLuint,
@@ -101,46 +103,47 @@ impl Texture2D {
         Self(TextureBase::new(Self::get_type()))
     }
 
-    pub fn with_data<ET>(size: [u32; 2], data: &[ET], format: GLenum) -> Option<Self>
+    pub fn with_data<ET>(size: [usize; 2], data: &[ET], format: GLenum) -> Result<Self, String>
     where
         ET: HasGLEnum,
     {
         let mut r = Self::new();
         r.upload_data_to_bound_texture(size, data, format)?;
-        Some(r)
+        Ok(r)
     }
 
     pub fn upload_data_to_bound_texture<ET>(
         self: &mut Self,
-        size: [u32; 2],
+        size: [usize; 2],
         data: &[ET],
         format: GLenum,
-    ) -> Option<()>
+    ) -> Result<(), String>
     where
         ET: HasGLEnum,
     {
-        let l: u32 = unwrap_or_ret_none!(data.len().try_into());
-        let (internal_fmt, cpp) = crate::format_to_gl_internal_format(
+        let l = data.len();
+        let (internal_fmt, cpp) = unwrap_option_or_ret!(crate::format_to_gl_internal_format(
             (std::mem::size_of::<ET>() * 8).try_into().unwrap(),
             format,
-        )?;
-        if size[0] * size[1] * u32::from(cpp) != l {
-            return None;
+        ), Err("Invalid format type!".to_owned()));
+
+        if size[0] * size[1] * usize::from(cpp) != l {
+            return Err(format!("Size provided is: {} pixels * {} pixels * {} values per pixel =/= {} (size of data array provided)!", size[0], size[1], cpp, size[0] * size[1] * usize::from(cpp)));
         }
         unsafe {
             gl::TexImage2D(
                 Self::get_type(),
                 0,
                 internal_fmt,
-                unwrap_or_ret_none!(size[0].try_into()),
-                unwrap_or_ret_none!(size[1].try_into()),
+                unwrap_result_or_ret!(size[0].try_into(), Err("Size[0] too big for opengl!".to_owned())),
+                unwrap_result_or_ret!(size[1].try_into(), Err("Size[1] too big for opengl!".to_owned())),
                 0,
                 format,
                 ET::get_gl_enum(),
                 &data[0] as *const ET as *const std::ffi::c_void,
             );
         }
-        Some(())
+        Ok(())
     }
 }
 
@@ -151,36 +154,36 @@ impl Texture2DArray {
 
     pub fn upload_data_to_bound_texture<ET>(
         self: &mut Self,
-        size: [u32; 3],
+        size: [usize; 3],
         data: &[ET],
         format: GLenum,
-    ) -> Option<()>
+    ) -> Result<(), String>
     where
         ET: HasGLEnum,
     {
-        let l: u32 = unwrap_or_ret_none!(data.len().try_into());
-        let (internal_fmt, cpp) = crate::format_to_gl_internal_format(
+        let l = data.len();
+        let (internal_fmt, cpp) = unwrap_option_or_ret!(crate::format_to_gl_internal_format(
             (std::mem::size_of::<ET>() * 8).try_into().unwrap(),
             format,
-        )?;
-        if size[0] * size[1] * size[2] * u32::from(cpp) != l {
-            return None;
+        ), Err("Invalid format type!".to_owned()));
+        if size[0] * size[1] * size[2] * usize::from(cpp) != l {
+            return Err(format!("Size provided is: {} pixels * {} pixels * {} images * {} values per pixel =/= {} (size of data array provided)!", size[0], size[1], size[2], cpp, size[0] * size[1] * size[2] * usize::from(cpp)));
         }
         unsafe {
             gl::TexImage3D(
                 Self::get_type(),
                 0,
                 internal_fmt,
-                unwrap_or_ret_none!(size[0].try_into()),
-                unwrap_or_ret_none!(size[1].try_into()),
-                unwrap_or_ret_none!(size[2].try_into()),
+                unwrap_result_or_ret!(size[0].try_into(), Err("Size[0] provided is too big for opengl!".to_owned())),
+                unwrap_result_or_ret!(size[1].try_into(), Err("Size[1] provided is too big for opengl!".to_owned())),
+                unwrap_result_or_ret!(size[2].try_into(), Err("Size[2] provided is too big for opengl!".to_owned())),
                 0,
                 format,
                 ET::get_gl_enum(),
                 &data[0] as *const ET as *const std::ffi::c_void,
             );
         }
-        Some(())
+        Ok(())
     }
 }
 
@@ -191,36 +194,35 @@ impl Texture3D {
 
     pub fn upload_data_to_bound_texture<ET>(
         self: &mut Self,
-        size: [u32; 3],
+        size: [usize; 3],
         data: &[ET],
         format: GLenum,
-    ) -> Option<()>
+    ) -> Result<(), String>
     where
         ET: HasGLEnum,
     {
-        let l: u32 = unwrap_or_ret_none!(data.len().try_into());
-        let (internal_fmt, cpp) = crate::format_to_gl_internal_format(
+        let (internal_fmt, cpp) = unwrap_option_or_ret!(crate::format_to_gl_internal_format(
             (std::mem::size_of::<ET>() * 8).try_into().unwrap(),
             format,
-        )?;
-        if size[0] * size[1] * size[2] * u32::from(cpp) != l {
-            return None;
+        ), Err("Invalid format type!".to_owned()));
+        if size[0] * size[1] * size[2] * usize::from(cpp) != data.len() {
+            return Err(format!("Size provided is: {} pixels * {} pixels * {} pixels * {} values per pixel =/= {} (size of data array provided)!", size[0], size[1], size[2], cpp, size[0] * size[1] * size[2] * usize::from(cpp)));
         }
         unsafe {
             gl::TexImage3D(
                 Self::get_type(),
                 0,
                 internal_fmt,
-                unwrap_or_ret_none!(size[0].try_into()),
-                unwrap_or_ret_none!(size[1].try_into()),
-                unwrap_or_ret_none!(size[2].try_into()),
+                unwrap_result_or_ret!(size[0].try_into(), Err("Size[0] provided is too big for opengl!".to_owned())),
+                unwrap_result_or_ret!(size[1].try_into(), Err("Size[1] provided is too big for opengl!".to_owned())),
+                unwrap_result_or_ret!(size[2].try_into(), Err("Size[2] provided is too big for opengl!".to_owned())),
                 0,
                 format,
                 ET::get_gl_enum(),
                 &data[0] as *const ET as *const std::ffi::c_void,
             );
         }
-        Some(())
+        Ok(())
     }
 }
 

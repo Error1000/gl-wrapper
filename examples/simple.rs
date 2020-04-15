@@ -81,16 +81,7 @@ fn main() {
     };
 
     program.bind_program();
-    // TODO: Add an auto_load_all() function
-    program
-        .load_attribute("position")
-        .expect("Failed to load attribute from shader!");
-    program
-        .load_attribute("tex_coord")
-        .expect("Failed to load attribute from shader!");
-    program
-        .load_sampler("obj_tex")
-        .expect("Failed to load attribute from shader!");
+    program.auto_load_all(30).unwrap();
     println!("Done!");
 
     // NOTE: "with_data" constructors grantee that the object crated WILL be bound "new" constructors do not
@@ -101,10 +92,10 @@ fn main() {
         let im = image::open(&Path::new("apple.png"))
             .expect("Failed to read texture from disk! Are you sure it exists?")
             .into_rgba();
-        texture::Texture2D::with_data([im.width(), im.height()], im.as_ref(), gl::RGBA)
+        texture::Texture2D::with_data([im.width().try_into().unwrap(), im.height().try_into().unwrap()], im.as_ref(), gl::RGBA)
             .expect("Failed to crate texture!")
     };
-    t.bind_texture_for_sampling(program.get_sampler_id("obj_tex"));
+    t.bind_texture_for_sampling(program.get_sampler_id("obj_tex").unwrap());
 
     println!("Done!");
 
@@ -115,12 +106,12 @@ fn main() {
 
     let pos_vbo = buffer_obj::VBO::<GLfloat>::with_data(&[2], &VERTEX_DATA, gl::STATIC_DRAW)
         .expect("Failed to upload data to vbo!");
-    a.attach_bound_vbo_to_bound_vao(&pos_vbo, program.get_attribute_id("position"), 0)
+    a.attach_bound_vbo_to_bound_vao(&pos_vbo, program.get_attribute_id("position").unwrap(), 0)
         .expect("Failed to attach vob to vao!");
 
     let tex_vbo = buffer_obj::VBO::<GLfloat>::with_data(&[2], &TEX_DATA, gl::STATIC_DRAW)
         .expect("Failed to upload data to vbo!");
-    a.attach_bound_vbo_to_bound_vao(&tex_vbo, program.get_attribute_id("tex_coord"), 0)
+    a.attach_bound_vbo_to_bound_vao(&tex_vbo, program.get_attribute_id("tex_coord").unwrap(), 0)
         .expect("Failed to attach vbo to vao!");
 
     a.bind_vao_for_program(&program).expect("Shader is asking for more values than vao has attached, all attributes the shader uses must be attached to vao!");
@@ -147,7 +138,7 @@ fn main() {
             // Window stuff
             Event::WindowEvent { event, .. } => match event {
                 WindowEvent::Resized(PhysicalSize { width, height }) => {
-                    gl_wrapper::set_gl_draw_size(width, height);
+                    gl_wrapper::set_gl_draw_size(width, height).unwrap();
                 }
                 WindowEvent::CloseRequested => *control_flow = ControlFlow::Exit,
                 WindowEvent::KeyboardInput {
@@ -176,7 +167,7 @@ fn main() {
                     gl_window.swap_buffers().unwrap();
                     t = Instant::now();
                 }
-            }
+            },
             _ => {}
         }
     });
