@@ -33,7 +33,7 @@ impl VAO {
         r
     }
 
-    pub fn bind_ao(self: &mut Self) {
+    pub fn bind_ao(self: &Self) {
         unsafe {
             gl::BindVertexArray(self.id);
         }
