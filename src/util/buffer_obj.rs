@@ -57,16 +57,25 @@ impl<'a, ET> VBO<'a, ET> {
     // NOTE: This dosen't just return a value it uses two values already in the struct to get this value so it's not as lightweight as other getters
     pub fn get_num_of_vertices(self: &Self) -> isize {
         let mut sum: isize = 0;
-        for e in self.get_elem_per_vertex(){ sum += isize::from(*e); }
-        self.get_size() / isize::from(sum)
+        for e in self.get_elem_per_vertex() {
+            sum += isize::from(*e);
+        }
+        self.get_size() / sum
     }
 
     pub fn upload_to_bound_bo(self: &mut Self, data: &[ET], usage: GLenum) -> Result<(), String> {
-        self.0.size = unwrap_result_or_ret!(isize::try_from(data.len()), Err("Size of data too big for opengl!".to_owned()));
+        self.0.size = unwrap_result_or_ret!(
+            isize::try_from(data.len()),
+            Err("Size of data too big for opengl!".to_owned())
+        );
         unsafe {
             gl::BufferData(
                 Self::get_type(),
-                self.get_size() * unwrap_result_or_ret!(isize::try_from(size_of::<ET>()), Err("Invalid size of data type, how even?".to_owned())),
+                self.get_size()
+                    * unwrap_result_or_ret!(
+                        isize::try_from(size_of::<ET>()),
+                        Err("Invalid size of data type, how even?".to_owned())
+                    ),
                 &data[0] as *const ET as *const std::ffi::c_void,
                 usage,
             );
@@ -88,11 +97,18 @@ impl<ET> IBO<ET> {
     }
 
     pub fn upload_to_bound_bo(self: &mut Self, data: &[ET], usage: GLenum) -> Result<(), String> {
-        self.0.size = unwrap_result_or_ret!(isize::try_from(data.len()), Err("Size of data is too big for opengl!".to_owned()));
+        self.0.size = unwrap_result_or_ret!(
+            isize::try_from(data.len()),
+            Err("Size of data is too big for opengl!".to_owned())
+        );
         unsafe {
             gl::BufferData(
                 Self::get_type(),
-                self.get_size() * unwrap_result_or_ret!(isize::try_from(size_of::<ET>()), Err("Invalid size of data type, how even?".to_owned())),
+                self.get_size()
+                    * unwrap_result_or_ret!(
+                        isize::try_from(size_of::<ET>()),
+                        Err("Invalid size of data type, how even?".to_owned())
+                    ),
                 &data[0] as *const ET as *const std::ffi::c_void,
                 usage,
             );

@@ -24,10 +24,8 @@ macro_rules! unwrap_option_or_ret {
             Some(val) => val,
             None => return $y,
         }
-    }
+    };
 }
-
-
 
 // NOTE about design: To future self never have getters that get a mutable self reference or return a mutable reference to a value no matter what
 #[inline]
@@ -66,8 +64,10 @@ pub fn set_gl_draw_size(w: u32, h: u32) -> Result<(), &'static str> {
     }
     Ok(())
 }
-// Since this is a pub trait if somebody decides to implement HasGLEnum for their own type and get the enum worng this would allow for a buffer overflow/underflow in all functions relying on this without using unsafe in the cde you have written this makes sure that that will never happen without using unsafe at least once in your code
 pub trait HasGLEnum {
+    /// # Safety
+    ///
+    /// Since this is a pub trait if somebody decides to implement HasGLEnum for their own type and get the enum wrong this would allow for a buffer overflow/underflow in all unsafe functions relying on this
     unsafe fn get_gl_enum() -> GLenum;
 }
 

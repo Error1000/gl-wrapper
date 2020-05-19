@@ -1,8 +1,8 @@
+use crate::unwrap_option_or_ret;
+use crate::unwrap_result_or_ret;
 use crate::HasGLEnum;
 use gl::types::*;
 use std::convert::TryInto;
-use crate::unwrap_result_or_ret;
-use crate::unwrap_option_or_ret;
 
 pub struct TextureBase {
     id: GLuint,
@@ -60,13 +60,25 @@ pub trait TextureFunc {
 
     fn set_min_filter_of_bound_tex(self: &mut Self, min_filter: GLuint) {
         unsafe {
-            gl::TexParameteri(Self::get_type(), gl::TEXTURE_MIN_FILTER, min_filter.try_into().expect("FATAL Failure, faulty opengl implementation!"));
+            gl::TexParameteri(
+                Self::get_type(),
+                gl::TEXTURE_MIN_FILTER,
+                min_filter
+                    .try_into()
+                    .expect("FATAL Failure, faulty opengl implementation!"),
+            );
         }
     }
 
     fn set_mag_filter_of_bound_tex(self: &mut Self, mag_filter: GLuint) {
         unsafe {
-            gl::TexParameteri(Self::get_type(), gl::TEXTURE_MAG_FILTER, mag_filter.try_into().expect("FATAL Failure, faulty opengl implementation!"));
+            gl::TexParameteri(
+                Self::get_type(),
+                gl::TEXTURE_MAG_FILTER,
+                mag_filter
+                    .try_into()
+                    .expect("FATAL Failure, faulty opengl implementation!"),
+            );
         }
     }
 
@@ -122,10 +134,13 @@ impl Texture2D {
         ET: HasGLEnum,
     {
         let l = data.len();
-        let (internal_fmt, cpp) = unwrap_option_or_ret!(crate::format_to_gl_internal_format(
-            (std::mem::size_of::<ET>() * 8).try_into().unwrap(),
-            format,
-        ), Err("Invalid format type!".to_owned()));
+        let (internal_fmt, cpp) = unwrap_option_or_ret!(
+            crate::format_to_gl_internal_format(
+                (std::mem::size_of::<ET>() * 8).try_into().unwrap(),
+                format,
+            ),
+            Err("Invalid format type!".to_owned())
+        );
 
         if size[0] * size[1] * usize::from(cpp) != l {
             return Err(format!("Size provided is: {} pixels * {} pixels * {} values per pixel =/= {} (size of data array provided)!", size[0], size[1], cpp, size[0] * size[1] * usize::from(cpp)));
@@ -135,8 +150,14 @@ impl Texture2D {
                 Self::get_type(),
                 0,
                 internal_fmt,
-                unwrap_result_or_ret!(size[0].try_into(), Err("Size[0] too big for opengl!".to_owned())),
-                unwrap_result_or_ret!(size[1].try_into(), Err("Size[1] too big for opengl!".to_owned())),
+                unwrap_result_or_ret!(
+                    size[0].try_into(),
+                    Err("Size[0] too big for opengl!".to_owned())
+                ),
+                unwrap_result_or_ret!(
+                    size[1].try_into(),
+                    Err("Size[1] too big for opengl!".to_owned())
+                ),
                 0,
                 format,
                 ET::get_gl_enum(),
@@ -162,10 +183,13 @@ impl Texture2DArray {
         ET: HasGLEnum,
     {
         let l = data.len();
-        let (internal_fmt, cpp) = unwrap_option_or_ret!(crate::format_to_gl_internal_format(
-            (std::mem::size_of::<ET>() * 8).try_into().unwrap(),
-            format,
-        ), Err("Invalid format type!".to_owned()));
+        let (internal_fmt, cpp) = unwrap_option_or_ret!(
+            crate::format_to_gl_internal_format(
+                (std::mem::size_of::<ET>() * 8).try_into().unwrap(),
+                format,
+            ),
+            Err("Invalid format type!".to_owned())
+        );
         if size[0] * size[1] * size[2] * usize::from(cpp) != l {
             return Err(format!("Size provided is: {} pixels * {} pixels * {} images * {} values per pixel =/= {} (size of data array provided)!", size[0], size[1], size[2], cpp, size[0] * size[1] * size[2] * usize::from(cpp)));
         }
@@ -174,9 +198,18 @@ impl Texture2DArray {
                 Self::get_type(),
                 0,
                 internal_fmt,
-                unwrap_result_or_ret!(size[0].try_into(), Err("Size[0] provided is too big for opengl!".to_owned())),
-                unwrap_result_or_ret!(size[1].try_into(), Err("Size[1] provided is too big for opengl!".to_owned())),
-                unwrap_result_or_ret!(size[2].try_into(), Err("Size[2] provided is too big for opengl!".to_owned())),
+                unwrap_result_or_ret!(
+                    size[0].try_into(),
+                    Err("Size[0] provided is too big for opengl!".to_owned())
+                ),
+                unwrap_result_or_ret!(
+                    size[1].try_into(),
+                    Err("Size[1] provided is too big for opengl!".to_owned())
+                ),
+                unwrap_result_or_ret!(
+                    size[2].try_into(),
+                    Err("Size[2] provided is too big for opengl!".to_owned())
+                ),
                 0,
                 format,
                 ET::get_gl_enum(),
@@ -201,10 +234,13 @@ impl Texture3D {
     where
         ET: HasGLEnum,
     {
-        let (internal_fmt, cpp) = unwrap_option_or_ret!(crate::format_to_gl_internal_format(
-            (std::mem::size_of::<ET>() * 8).try_into().unwrap(),
-            format,
-        ), Err("Invalid format type!".to_owned()));
+        let (internal_fmt, cpp) = unwrap_option_or_ret!(
+            crate::format_to_gl_internal_format(
+                (std::mem::size_of::<ET>() * 8).try_into().unwrap(),
+                format,
+            ),
+            Err("Invalid format type!".to_owned())
+        );
         if size[0] * size[1] * size[2] * usize::from(cpp) != data.len() {
             return Err(format!("Size provided is: {} pixels * {} pixels * {} pixels * {} values per pixel =/= {} (size of data array provided)!", size[0], size[1], size[2], cpp, size[0] * size[1] * size[2] * usize::from(cpp)));
         }
@@ -213,9 +249,18 @@ impl Texture3D {
                 Self::get_type(),
                 0,
                 internal_fmt,
-                unwrap_result_or_ret!(size[0].try_into(), Err("Size[0] provided is too big for opengl!".to_owned())),
-                unwrap_result_or_ret!(size[1].try_into(), Err("Size[1] provided is too big for opengl!".to_owned())),
-                unwrap_result_or_ret!(size[2].try_into(), Err("Size[2] provided is too big for opengl!".to_owned())),
+                unwrap_result_or_ret!(
+                    size[0].try_into(),
+                    Err("Size[0] provided is too big for opengl!".to_owned())
+                ),
+                unwrap_result_or_ret!(
+                    size[1].try_into(),
+                    Err("Size[1] provided is too big for opengl!".to_owned())
+                ),
+                unwrap_result_or_ret!(
+                    size[2].try_into(),
+                    Err("Size[2] provided is too big for opengl!".to_owned())
+                ),
                 0,
                 format,
                 ET::get_gl_enum(),

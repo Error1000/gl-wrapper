@@ -92,8 +92,15 @@ fn main() {
         let im = image::open(&Path::new("apple.png"))
             .expect("Failed to read texture from disk! Are you sure it exists?")
             .into_rgba();
-        texture::Texture2D::with_data([im.width().try_into().unwrap(), im.height().try_into().unwrap()], im.as_ref(), gl::RGBA)
-            .expect("Failed to crate texture!")
+        texture::Texture2D::with_data(
+            [
+                im.width().try_into().unwrap(),
+                im.height().try_into().unwrap(),
+            ],
+            im.as_ref(),
+            gl::RGBA,
+        )
+        .expect("Failed to crate texture!")
     };
     t.bind_texture_for_sampling(program.get_sampler_id("obj_tex").unwrap());
 
@@ -102,7 +109,7 @@ fn main() {
     // Load mesh data ( indices, vertices, uv data )
     println!("Loading mesh ...");
     let mut a = aggregator_obj::VAO::new();
-    a.bind_vao_for_data();
+    a.bind_ao();
 
     let pos_vbo = buffer_obj::VBO::<GLfloat>::with_data(&[2], &VERTEX_DATA, gl::STATIC_DRAW)
         .expect("Failed to upload data to vbo!");
@@ -114,7 +121,7 @@ fn main() {
     a.attach_bound_vbo_to_bound_vao(&tex_vbo, program.get_attribute_id("tex_coord").unwrap(), 0)
         .expect("Failed to attach vbo to vao!");
 
-    a.bind_vao_for_program(&program).expect("Shader is asking for more values than vao has attached, all attributes the shader uses must be attached to vao!");
+    a.adapt_bound_vao_to_program(&program).expect("Shader is asking for more values than vao has attached, all attributes the shader uses must be attached to vao!");
 
     let ind_ibo = buffer_obj::IBO::<GLushort>::with_data(&IND_DATA, gl::STATIC_DRAW)
         .expect("Failed to create ibo!");
@@ -167,7 +174,7 @@ fn main() {
                     gl_window.swap_buffers().unwrap();
                     t = Instant::now();
                 }
-            },
+            }
             _ => {}
         }
     });
