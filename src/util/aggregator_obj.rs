@@ -39,18 +39,18 @@ impl VAO {
         }
     }
 
-    pub fn adapt_bound_vao_to_program(self: &mut Self, p: &program::Program) -> Option<()> {
+    pub fn adapt_bound_vao_to_program(self: &mut Self, p: &program::Program) -> Result<(), ()> {
         for l in p.get_attribute_hashmap().values() {
             // If the data index the program needs has not been attached throw error so it is
             // impossible to cause undefined behaviour
             if !self.available_ind.contains(&l) {
-                return None;
+                return Err(());
             }
             unsafe {
                 gl::EnableVertexAttribArray(*l);
             }
         }
-        Some(())
+        Ok(())
     }
 
     //TODO: Rework

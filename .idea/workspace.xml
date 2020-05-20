@@ -40,6 +40,7 @@
     <property name="org.rust.hideDetachedFileNotifications/home/dan/Documents/Coding/Rust/OpenGLWrapper/src/util/mod.rs" value="true" />
     <property name="org.rust.hideDetachedFileNotifications/home/dan/Documents/Coding/Rust/gl-wrapper/src/API.rs" value="true" />
     <property name="org.rust.hideDetachedFileNotifications/home/dan/Documents/Coding/Rust/gl-wrapper/src/render/mod.rs" value="true" />
+    <property name="org.rust.hideDetachedFileNotifications/home/dan/Documents/Coding/Rust/gl-wrapper/src/util/aggregator_obj.rs" value="true" />
     <property name="org.rust.hideNoCargoProjectNotifications/home/dan/Documents/Coding/Rust/OpenGLWrapper/src/main.rs" value="true" />
     <property name="org.rust.hideNoCargoProjectNotifications/home/dan/Documents/Coding/Rust/gl-wrapper/examples/simple.rs" value="true" />
     <property name="org.rust.hideNoCargoProjectNotifications/home/dan/Documents/Coding/Rust/gl-wrapper/src/main.rs" value="true" />
@@ -284,26 +285,26 @@
       <screen x="0" y="0" width="1920" height="1051" />
     </state>
     <state x="788" y="93" width="764" height="805" key="CommitChangelistDialog2/0.0.1920.1051@0.0.1920.1051" timestamp="1581936049415" />
-    <state x="743" y="284" width="428" height="484" key="FileChooserDialogImpl" timestamp="1589917873533">
+    <state x="743" y="284" width="428" height="484" key="FileChooserDialogImpl" timestamp="1589920119727">
       <screen x="0" y="0" width="1920" height="1051" />
     </state>
-    <state x="743" y="284" width="428" height="484" key="FileChooserDialogImpl/0.0.1920.1051@0.0.1920.1051" timestamp="1589917873533" />
-    <state width="1878" height="274" key="GridCell.Tab.0.bottom" timestamp="1589917873552">
+    <state x="743" y="284" width="428" height="484" key="FileChooserDialogImpl/0.0.1920.1051@0.0.1920.1051" timestamp="1589920119727" />
+    <state width="1878" height="274" key="GridCell.Tab.0.bottom" timestamp="1589987413494">
       <screen x="0" y="0" width="1920" height="1051" />
     </state>
-    <state width="1878" height="274" key="GridCell.Tab.0.bottom/0.0.1920.1051@0.0.1920.1051" timestamp="1589917873552" />
-    <state width="1878" height="274" key="GridCell.Tab.0.center" timestamp="1589917873551">
+    <state width="1878" height="274" key="GridCell.Tab.0.bottom/0.0.1920.1051@0.0.1920.1051" timestamp="1589987413494" />
+    <state width="1878" height="274" key="GridCell.Tab.0.center" timestamp="1589987413492">
       <screen x="0" y="0" width="1920" height="1051" />
     </state>
-    <state width="1878" height="274" key="GridCell.Tab.0.center/0.0.1920.1051@0.0.1920.1051" timestamp="1589917873551" />
-    <state width="1878" height="274" key="GridCell.Tab.0.left" timestamp="1589917873551">
+    <state width="1878" height="274" key="GridCell.Tab.0.center/0.0.1920.1051@0.0.1920.1051" timestamp="1589987413492" />
+    <state width="1878" height="274" key="GridCell.Tab.0.left" timestamp="1589987413492">
       <screen x="0" y="0" width="1920" height="1051" />
     </state>
-    <state width="1878" height="274" key="GridCell.Tab.0.left/0.0.1920.1051@0.0.1920.1051" timestamp="1589917873551" />
-    <state width="1878" height="274" key="GridCell.Tab.0.right" timestamp="1589917873552">
+    <state width="1878" height="274" key="GridCell.Tab.0.left/0.0.1920.1051@0.0.1920.1051" timestamp="1589987413492" />
+    <state width="1878" height="274" key="GridCell.Tab.0.right" timestamp="1589987413493">
       <screen x="0" y="0" width="1920" height="1051" />
     </state>
-    <state width="1878" height="274" key="GridCell.Tab.0.right/0.0.1920.1051@0.0.1920.1051" timestamp="1589917873552" />
+    <state width="1878" height="274" key="GridCell.Tab.0.right/0.0.1920.1051@0.0.1920.1051" timestamp="1589987413493" />
     <state x="449" y="161" key="SettingsEditor" timestamp="1589917264193">
       <screen x="0" y="0" width="1920" height="1051" />
     </state>
@@ -320,5 +321,9 @@
       <screen x="0" y="0" width="1920" height="1051" />
     </state>
     <state x="276" y="432" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1920.1051@0.0.1920.1051" timestamp="1581447449088" />
+    <state x="916" y="70" width="825" height="768" key="find.popup" timestamp="1589987662852">
+      <screen x="0" y="0" width="1920" height="1051" />
+    </state>
+    <state x="916" y="70" width="825" height="768" key="find.popup/0.0.1920.1051@0.0.1920.1051" timestamp="1589987662852" />
   </component>
 </project>
