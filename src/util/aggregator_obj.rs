@@ -1,11 +1,11 @@
-use gl::types::*;
-use std::ptr;
 use crate::render::program;
 use crate::unwrap_result_or_ret;
 use crate::util::buffer_obj;
 use crate::HasGLEnum;
+use gl::types::*;
 use std::convert::TryFrom;
 use std::mem::size_of;
+use std::ptr;
 
 pub struct VAO {
     id: GLuint,
@@ -61,16 +61,20 @@ impl VAO {
     where
         ET: HasGLEnum,
     {
-	// These are all i32 because that's what the opengl function takes (GLint)
+        // These are all i32 because that's what the opengl function takes (GLint)
         let mut sum: i32 = 0;
-	for e in bo.get_elem_per_vertex(){
-		sum += i32::from(*e);
-	}
-	sum -= i32::from(bo.get_elem_per_vertex()[stride_ind]);
-	let skip: i32 = sum * unwrap_result_or_ret!(
-                    i32::try_from(size_of::<ET>()),
-                    Err("Type size too big for opengl!".to_owned()));
-	if skip < 0 { return Err("Size of elemnts computed was negative( this should have been impossible, maybe an integer overflow happened?)".to_owned()); }
+        for e in bo.get_elem_per_vertex() {
+            sum += i32::from(*e);
+        }
+        sum -= i32::from(bo.get_elem_per_vertex()[stride_ind]);
+        let skip: i32 = sum
+            * unwrap_result_or_ret!(
+                i32::try_from(size_of::<ET>()),
+                Err("Type size too big for opengl!".to_owned())
+            );
+        if skip < 0 {
+            return Err("Size of elemnts computed was negative( this should have been impossible, maybe an integer overflow happened?)".to_owned());
+        }
         unsafe {
             gl::VertexAttribPointer(
                 index,
