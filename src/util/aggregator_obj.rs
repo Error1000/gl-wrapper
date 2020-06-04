@@ -52,11 +52,13 @@ impl VAO {
         Ok(())
     }
 
+    /// Note: the auto_convert_to_f32 is here because some pretty old gpus can only work with f32, however this dosen't actually convert the entire VBO so it won't use more memory, as this does the conversion before each shader execution, i think
     pub fn attach_bound_vbo_to_bound_vao<ET>(
         self: &mut Self,
         bo: &buffer_obj::VBO<ET>,
         index: GLuint,
         stride_ind: usize,
+        auto_convert_to_f32: bool
     ) -> Result<(), String>
     where
         ET: HasGLEnum,
@@ -73,17 +75,39 @@ impl VAO {
                 Err("Type size too big for opengl!".to_owned())
             );
         if skip < 0 {
-            return Err("Size of elemnts computed was negative( this should have been impossible, maybe an integer overflow happened?)".to_owned());
+            return Err("Size of elements computed was negative( this should have been impossible, maybe an integer overflow happened?)".to_owned());
         }
+
         unsafe {
-            gl::VertexAttribPointer(
-                index,
-                bo.get_elem_per_vertex()[stride_ind].into(),
-                ET::get_gl_enum(),
-                gl::FALSE,
-                skip, // how many elements to skip each iteration
-                (ptr::null() as *const std::ffi::c_void).offset(unwrap_result_or_ret!(isize::try_from(skip), Err("Architecture size too small, stride offset too big, you put too many elements per vertex, so many that the cpu's architecutre can't properly hold the offset pointer so it can know where the elements for each attribute begin, i'm both impressed and horrified at the same time :)".to_owned()))), // offset by stride once ( not every iteration ) to make sure skipping works and that we are reading the right elements
-            );
+            let gl_typ =  ET::get_gl_enum();
+            if gl_typ == f32::get_gl_enum() || auto_convert_to_f32{
+                    gl::VertexAttribPointer(
+                        index,
+                        bo.get_elem_per_vertex()[stride_ind].into(),
+                        gl_typ,
+                        gl::FALSE,
+                        skip, // how many elements to skip each iteration
+                        (ptr::null() as *const std::ffi::c_void).offset(unwrap_result_or_ret!(isize::try_from(skip), Err("Architecture size too small, stride offset too big, you put too many elements per vertex, so many that the cpu's architecutre can't properly hold the offset pointer so it can know where the elements for each attribute begin, i'm both impressed and horrified at the same time :)".to_owned()))), // offset by stride once ( not every iteration ) to make sure skipping works and that we are reading the right elements
+                    );
+            }else if gl_typ == i8::get_gl_enum() || gl_typ == u8::get_gl_enum() || gl_typ == i16::get_gl_enum() || gl_typ == u16::get_gl_enum() || gl_typ == i32::get_gl_enum() || gl_typ == u32::get_gl_enum(){
+                gl::VertexAttribIPointer(
+                    index,
+                    bo.get_elem_per_vertex()[stride_ind].into(),
+                    gl_typ,
+                    skip, // how many elements to skip each iteration
+                    (ptr::null() as *const std::ffi::c_void).offset(unwrap_result_or_ret!(isize::try_from(skip), Err("Architecture size too small, stride offset too big, you put too many elements per vertex, so many that the cpu's architecutre can't properly hold the offset pointer so it can know where the elements for each attribute begin, i'm both impressed and horrified at the same time :)".to_owned()))), // offset by stride once ( not every iteration ) to make sure skipping works and that we are reading the right elements
+                );
+            }else if gl_typ == f64::get_gl_enum(){
+                gl::VertexAttribLPointer(
+                    index,
+                    bo.get_elem_per_vertex()[stride_ind].into(),
+                    gl_typ,
+                    skip, // how many elements to skip each iteration
+                    (ptr::null() as *const std::ffi::c_void).offset(unwrap_result_or_ret!(isize::try_from(skip), Err("Architecture size too small, stride offset too big, you put too many elements per vertex, so many that the cpu's architecutre can't properly hold the offset pointer so it can know where the elements for each attribute begin, i'm both impressed and horrified at the same time :)".to_owned()))), // offset by stride once ( not every iteration ) to make sure skipping works and that we are reading the right elements
+                );
+            }else{
+                return Err(String::from("Invalid data type for opengl!"));
+            }
         }
         self.available_ind.push(index);
         Ok(())

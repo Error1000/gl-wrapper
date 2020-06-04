@@ -78,6 +78,13 @@ impl HasGLEnum for GLfloat {
     }
 }
 
+impl HasGLEnum for GLdouble {
+    #[inline(always)]
+    unsafe fn get_gl_enum() -> GLenum {
+        gl::DOUBLE
+    }
+}
+
 impl HasGLEnum for GLint {
     #[inline(always)]
     unsafe fn get_gl_enum() -> GLenum {

@@ -7,7 +7,6 @@ use gl_wrapper::render::*;
 use gl_wrapper::util::buffer_obj::BOFunc;
 use gl_wrapper::util::*;
 use gl_wrapper::HasGLEnum;
-
 use glutin::dpi::PhysicalSize;
 use std::convert::TryInto;
 
@@ -35,9 +34,12 @@ static IND_DATA: [GLushort; 6] = [0, 1, 3, 1, 2, 3];
 // Shader sources
 static VS_SRC: &str = "
 #version 150
+
 attribute vec2 position;
 attribute vec2 tex_coord;
+
 out vec2 pass_tex_coord;
+
 void main() {
     pass_tex_coord = tex_coord;
     gl_Position = vec4(position, 0.0, 1.0);
@@ -45,6 +47,7 @@ void main() {
 
 static FS_SRC: &str = "
 #version 150
+
 out vec4 out_color;
 uniform sampler2D obj_tex;
 in vec2 pass_tex_coord;
@@ -113,12 +116,12 @@ fn main() {
 
     let pos_vbo = buffer_obj::VBO::<GLfloat>::with_data(&[2], &VERTEX_DATA, gl::STATIC_DRAW)
         .expect("Failed to upload data to vbo!");
-    a.attach_bound_vbo_to_bound_vao(&pos_vbo, program.get_attribute_id("position").unwrap(), 0)
+    a.attach_bound_vbo_to_bound_vao(&pos_vbo, program.get_attribute_id("position").unwrap(), 0, false)
         .expect("Failed to attach vob to vao!");
 
     let tex_vbo = buffer_obj::VBO::<GLfloat>::with_data(&[2], &TEX_DATA, gl::STATIC_DRAW)
         .expect("Failed to upload data to vbo!");
-    a.attach_bound_vbo_to_bound_vao(&tex_vbo, program.get_attribute_id("tex_coord").unwrap(), 0)
+    a.attach_bound_vbo_to_bound_vao(&tex_vbo, program.get_attribute_id("tex_coord").unwrap(), 0, false)
         .expect("Failed to attach vbo to vao!");
 
     a.adapt_bound_vao_to_program(&program).expect("Shader is asking for more values than vao has attached, all attributes the shader uses must be attached to vao!");
