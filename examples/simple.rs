@@ -66,10 +66,10 @@ fn main() {
     let gl_window = glutin::ContextBuilder::new()
         .with_vsync(true)
         .build_windowed(window, &events_loop)
-        .expect("Failed to create window!");
+        .expect("Creating window!");
 
     // Load the OpenGL function pointers
-    let gl_window = gl_wrapper::init(gl_window).expect("Couldn't acquire gl context!");
+    let gl_window = gl_wrapper::init(gl_window).expect("Acquiring gl context!");
 
     println!("Window created but hidden!");
     println!("OpenGL Version: {}", gl_wrapper::get_gl_version_str());
@@ -93,7 +93,7 @@ fn main() {
 
     let t = {
         let im = image::open(&Path::new("apple.png"))
-            .expect("Failed to read texture from disk! Are you sure it exists?")
+            .expect("Reading textures!")
             .into_rgba();
         texture::Texture2D::with_data(
             [
@@ -103,7 +103,7 @@ fn main() {
             im.as_ref(),
             gl::RGBA,
         )
-        .expect("Failed to crate texture!")
+        .expect("Creating textures.")
     };
     t.bind_texture_for_sampling(program.get_sampler_id("obj_tex").unwrap());
 
@@ -115,34 +115,47 @@ fn main() {
     a.bind_ao();
 
     let pos_vbo = buffer_obj::VBO::<GLfloat>::with_data(&[2], &VERTEX_DATA, gl::STATIC_DRAW)
-        .expect("Failed to upload data to vbo!");
-    a.attach_bound_vbo_to_bound_vao(&pos_vbo, program.get_attribute_id("position").unwrap(), 0, false)
-        .expect("Failed to attach vob to vao!");
+        .expect("Uploading pos data to vbo!");
+    a.attach_bound_vbo_to_bound_vao(
+        &pos_vbo,
+        program.get_attribute_id("position").unwrap(),
+        0,
+        false,
+    )
+    .expect("Attaching pos vbo to vao!");
 
     let tex_vbo = buffer_obj::VBO::<GLfloat>::with_data(&[2], &TEX_DATA, gl::STATIC_DRAW)
-        .expect("Failed to upload data to vbo!");
-    a.attach_bound_vbo_to_bound_vao(&tex_vbo, program.get_attribute_id("tex_coord").unwrap(), 0, false)
-        .expect("Failed to attach vbo to vao!");
+        .expect("Uploading tex data to vbo!");
+    a.attach_bound_vbo_to_bound_vao(
+        &tex_vbo,
+        program.get_attribute_id("tex_coord").unwrap(),
+        0,
+        false,
+    )
+    .expect("Attaching tex vbo to vao!");
 
-    a.adapt_bound_vao_to_program(&program).expect("Shader is asking for more values than vao has attached, all attributes the shader uses must be attached to vao!");
+    a.adapt_bound_vao_to_program(&program)
+        .expect("Linking shader attributes to vao data!");
 
     let ind_ibo = buffer_obj::IBO::<GLushort>::with_data(&IND_DATA, gl::STATIC_DRAW)
-        .expect("Failed to create ibo!");
+        .expect("Uploading indecies to ibo!");
     println!("Done!");
 
     println!("Showing window!");
     gl_window.window().set_visible(true);
 
-    gl_wrapper::set_gl_clear_color(0.0, 0.0, 1.0, 1.0);
+    gl_wrapper::set_gl_clear_color(0.0, 0.0, 1.0, 1.0).unwrap();
+
     // Since these values won't change and the gl::DrawElements is in the hot path we are going to cache these values now just to make things simpler and faster
     let ibo_len = ind_ibo
         .get_size()
         .try_into()
-        .expect("The number of triangles you have is either negative, or too big!");
+        .expect("Getting number of triangles!");
+
     let mut t = Instant::now();
     // Note we use run-return to make sure that everything gets dropped ( although run also works )
     events_loop.run_return(|event, _, control_flow| {
-        // Unless we rewrite the control flow just wait until another evetn arrives when this iteration finished
+        // Set default for control_flow
         *control_flow = ControlFlow::Poll;
         match event {
             // Window stuff
@@ -151,6 +164,8 @@ fn main() {
                     gl_wrapper::set_gl_draw_size(width, height).unwrap();
                 }
                 WindowEvent::CloseRequested => *control_flow = ControlFlow::Exit,
+
+                // Handle esc key
                 WindowEvent::KeyboardInput {
                     input:
                         glutin::event::KeyboardInput {
@@ -159,7 +174,8 @@ fn main() {
                         },
                     ..
                 } => *control_flow = ControlFlow::Exit,
-                _ => {}
+
+                _ => {} // Default
             },
             // Rendering stuff
             Event::RedrawEventsCleared => {
@@ -170,7 +186,7 @@ fn main() {
                         gl::DrawElements(
                             gl::TRIANGLES,
                             ibo_len,
-                            GLushort::get_gl_enum(),
+                            GLushort::get_gl_type(),
                             ptr::null(),
                         );
                     }

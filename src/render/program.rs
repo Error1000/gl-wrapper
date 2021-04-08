@@ -10,7 +10,7 @@ use std::str;
 pub struct Program {
     id: GLuint,
     /// TODO: Maybe optimise this as realistically there aren't going to be more than 100 entries
-    /// in either of these hash maps so the 1 in O(1) becomes pretty big
+    /// in either of these hash maps so the 1 in O(1) becomes pretty big in comparison to a simple array (because of the small size)
     uniform_ids: HashMap<String, GLuint>,
     attrib_ids: HashMap<String, GLuint>,
 }
@@ -30,12 +30,14 @@ impl Program {
             uniform_ids: HashMap::new(),
             attrib_ids: HashMap::new(),
         };
-
+        r.bind_program();
         // Attach all shaders to program
+        shaders
+            .iter()
+            .for_each(|s| unsafe { gl::AttachShader(r.id, s.get_id()) });
+
+        // Link
         unsafe {
-            shaders
-                .iter()
-                .for_each(|s| gl::AttachShader(r.id, s.get_id()));
             gl::LinkProgram(r.id);
         }
 
@@ -66,12 +68,9 @@ impl Program {
         }
 
         // Detach all shaders from program
-        unsafe {
-            shaders
-                .iter()
-                .for_each(|s| gl::DetachShader(r.id, s.get_id()));
-        }
-
+        shaders
+            .iter()
+            .for_each(|s| unsafe { gl::DetachShader(r.id, s.get_id()) });
         Ok(r)
     }
 

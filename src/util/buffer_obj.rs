@@ -1,4 +1,4 @@
-use crate::unwrap_result_or_ret;
+use crate::{unwrap_result_or_ret, HasGLEnum};
 use gl::types::*;
 use std::convert::TryFrom;
 use std::marker::PhantomData;
@@ -6,7 +6,7 @@ use std::mem::size_of;
 
 pub struct BOBase<ET> {
     id: GLuint,
-    size: isize,
+    size: GLsizeiptr, // Opengl uses signed integers for size
     /// Used here to link each BO with it's data type on gpu to make sure no problems can happen from uploading data of the wrong datatype and corrupting buffers
     data: PhantomData<ET>,
 }
@@ -23,13 +23,11 @@ impl<ET> BOBase<ET> {
         }
         r
     }
-    pub fn get_size(self: &Self) -> isize {
-        self.size
-    }
 }
 
 impl<ET> Drop for BOBase<ET> {
     fn drop(self: &mut Self) {
+        // Drop ET array on gpu
         unsafe {
             gl::DeleteBuffers(1, &(self.id));
         }
@@ -57,25 +55,25 @@ impl<'a, ET> VBO<'a, ET> {
     }
 
     // NOTE: This dosen't just return a value it uses two values in the struct to compute this value so it's not as lightweight as other getters
-    pub fn get_num_of_vertices(self: &Self) -> isize {
-        let mut sum: isize = 0;
+    pub fn get_num_of_vertices(self: &Self) -> GLsizeiptr {
+        let mut sum: GLsizeiptr = 0;
         for e in self.get_elem_per_vertex() {
-            sum += isize::from(*e);
+            sum += GLsizeiptr::from(*e);
         }
         self.get_size() / sum
     }
 
     pub fn upload_to_bound_bo(self: &mut Self, data: &[ET], usage: GLenum) -> Result<(), String> {
         self.0.size = unwrap_result_or_ret!(
-            isize::try_from(data.len()),
+            GLsizeiptr::try_from(data.len()),
             Err("Too many elements in data slice for opengl!".to_owned())
         );
         unsafe {
             gl::BufferData(
-                Self::get_type(),
+                Self::get_gl_type(),
                 self.get_size()
                     * unwrap_result_or_ret!(
-                        isize::try_from(size_of::<ET>()),
+                        GLsizeiptr::try_from(size_of::<ET>()),
                         Err("Invalid size of data type, how even?".to_owned())
                     ),
                 &data[0] as *const ET as *const std::ffi::c_void,
@@ -100,15 +98,15 @@ impl<ET> IBO<ET> {
 
     pub fn upload_to_bound_bo(self: &mut Self, data: &[ET], usage: GLenum) -> Result<(), String> {
         self.0.size = unwrap_result_or_ret!(
-            isize::try_from(data.len()),
+            GLsizeiptr::try_from(data.len()),
             Err("Too many elements in data slice for opengl!".to_owned())
         );
         unsafe {
             gl::BufferData(
-                Self::get_type(),
+                Self::get_gl_type(),
                 self.get_size()
                     * unwrap_result_or_ret!(
-                        isize::try_from(size_of::<ET>()),
+                        GLsizeiptr::try_from(size_of::<ET>()),
                         Err("Invalid size of data type, how even?".to_owned())
                     ),
                 &data[0] as *const ET as *const std::ffi::c_void,
@@ -119,18 +117,34 @@ impl<ET> IBO<ET> {
     }
 }
 
-pub trait BOFunc<ET> {
+pub trait BOFunc<ET>
+where
+    Self: HasGLEnum,
+{
     #[inline(always)]
     fn bind_bo(self: &Self) {
-        unsafe { gl::BindBuffer(Self::get_type(), self.get_bo_base().id) }
+        unsafe { gl::BindBuffer(Self::get_gl_type(), self.get_bo_base().id) }
     }
 
     #[inline(always)]
-    fn get_size(self: &Self) -> isize {
+    fn get_size(self: &Self) -> GLsizeiptr {
         self.get_bo_base().size
     }
     fn get_bo_base(self: &Self) -> &BOBase<ET>;
-    fn get_type() -> GLenum;
+}
+
+unsafe impl<'a, ET> HasGLEnum for VBO<'a, ET> {
+    #[inline(always)]
+    fn get_gl_type() -> GLenum {
+        gl::ARRAY_BUFFER
+    }
+}
+
+unsafe impl<ET> HasGLEnum for IBO<ET> {
+    #[inline(always)]
+    fn get_gl_type() -> GLenum {
+        gl::ELEMENT_ARRAY_BUFFER
+    }
 }
 
 impl<'a, ET> BOFunc<ET> for VBO<'a, ET> {
@@ -138,19 +152,11 @@ impl<'a, ET> BOFunc<ET> for VBO<'a, ET> {
     fn get_bo_base(self: &Self) -> &BOBase<ET> {
         &self.0
     }
-    #[inline(always)]
-    fn get_type() -> GLenum {
-        gl::ARRAY_BUFFER
-    }
 }
 
 impl<ET> BOFunc<ET> for IBO<ET> {
     #[inline(always)]
     fn get_bo_base(self: &Self) -> &BOBase<ET> {
         &self.0
-    }
-    #[inline(always)]
-    fn get_type() -> GLenum {
-        gl::ELEMENT_ARRAY_BUFFER
     }
 }

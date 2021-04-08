@@ -21,21 +21,17 @@ impl TextureBase {
         let mut r = TextureBase { id: 0 };
         unsafe {
             gl::GenTextures(1, &mut r.id);
-            // Need to set scale filter otherwise the texture can never be used so we set a reasonable default here to avoid errors
+            // Need to set scale filter otherwise the texture can't be used so we set a reasonable default here to avoid errors
             gl::BindTexture(typ, r.id);
             gl::TexParameteri(
                 typ,
                 gl::TEXTURE_MIN_FILTER,
-                gl::LINEAR
-                    .try_into()
-                    .expect("FATAL Failure, faulty opengl implementation!"),
+                gl::LINEAR.try_into().expect("Converting to gl types!"),
             );
             gl::TexParameteri(
                 typ,
                 gl::TEXTURE_MAG_FILTER,
-                gl::LINEAR
-                    .try_into()
-                    .expect("FATAL Failure, faulty opengl implementation!"),
+                gl::LINEAR.try_into().expect("Converting to gl types!"),
             );
         }
         r
@@ -63,9 +59,7 @@ pub trait TextureFunc {
             gl::TexParameteri(
                 Self::get_type(),
                 gl::TEXTURE_MIN_FILTER,
-                min_filter
-                    .try_into()
-                    .expect("FATAL Failure, faulty opengl implementation!"),
+                min_filter.try_into().expect("Converting to gl types!"),
             );
         }
     }
@@ -75,9 +69,7 @@ pub trait TextureFunc {
             gl::TexParameteri(
                 Self::get_type(),
                 gl::TEXTURE_MAG_FILTER,
-                mag_filter
-                    .try_into()
-                    .expect("FATAL Failure, faulty opengl implementation!"),
+                mag_filter.try_into().expect("Converting to gl types!"),
             );
         }
     }
@@ -160,7 +152,7 @@ impl Texture2D {
                 ),
                 0,
                 format,
-                ET::get_gl_enum(),
+                ET::get_gl_type(),
                 &data[0] as *const ET as *const std::ffi::c_void,
             );
         }
@@ -212,7 +204,7 @@ impl Texture2DArray {
                 ),
                 0,
                 format,
-                ET::get_gl_enum(),
+                ET::get_gl_type(),
                 &data[0] as *const ET as *const std::ffi::c_void,
             );
         }
@@ -263,7 +255,7 @@ impl Texture3D {
                 ),
                 0,
                 format,
-                ET::get_gl_enum(),
+                ET::get_gl_type(),
                 &data[0] as *const ET as *const std::ffi::c_void,
             );
         }

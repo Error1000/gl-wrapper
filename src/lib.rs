@@ -37,19 +37,26 @@ pub fn get_gl_version_str() -> String {
     }
 }
 
-// NOTE: We use always here to make sure the optimiser gets the best chance to remove ethe bounds checks
+// NOTE: We use inline(always) here to make sure the optimiser gets the best chance to remove the bounds checks
 #[inline(always)]
-pub fn set_gl_clear_color(r: f32, g: f32, b: f32, a: f32) {
+pub fn set_gl_clear_color(r: f32, g: f32, b: f32, a: f32) -> Result<(), &'static str> {
     if r > 1.0 || r < 0.0 {
-        panic!("R value of clear color too big or too small ( has to be between 0.0 and 1.0 )!");
+        return Err(
+            "R value of clear color too big or too small ( has to be between 0.0 and 1.0 )!",
+        );
     } else if g > 1.0 || g < 0.0 {
-        panic!("G value of clear color too big or too small ( has to be between 0.0 and 1.0 )!");
+        return Err(
+            "G value of clear color too big or too small ( has to be between 0.0 and 1.0 )!",
+        );
     } else if b > 1.0 || b < 0.0 {
-        panic!("B value of clear color too big or too small ( has to be between 0.0 and 1.0 )!");
+        return Err(
+            "B value of clear color too big or too small ( has to be between 0.0 and 1.0 )!",
+        );
     }
     unsafe {
         gl::ClearColor(r, g, b, a);
     }
+    Ok(())
 }
 
 #[inline]
@@ -58,70 +65,70 @@ pub fn set_gl_draw_size(w: u32, h: u32) -> Result<(), &'static str> {
         gl::Viewport(
             0,
             0,
-            unwrap_result_or_ret!(w.try_into(), Err("Size of canvas too big for opengl!")),
-            unwrap_result_or_ret!(h.try_into(), Err("Size of canvas too big for opengl!")),
+            unwrap_result_or_ret!(w.try_into(), Err("Width of canvas too big for opengl!")),
+            unwrap_result_or_ret!(h.try_into(), Err("Height of canvas too big for opengl!")),
         );
     }
     Ok(())
 }
-pub trait HasGLEnum {
+pub unsafe trait HasGLEnum {
     /// # Safety
     ///
     /// Since this is a pub trait if somebody decides to implement HasGLEnum for their own type and get the enum wrong this would allow for a buffer overflow/underflow in all unsafe functions relying on this
-    unsafe fn get_gl_enum() -> GLenum;
+    fn get_gl_type() -> GLenum;
 }
 
-impl HasGLEnum for GLfloat {
+unsafe impl HasGLEnum for GLfloat {
     #[inline(always)]
-    unsafe fn get_gl_enum() -> GLenum {
+    fn get_gl_type() -> GLenum {
         gl::FLOAT
     }
 }
 
-impl HasGLEnum for GLdouble {
+unsafe impl HasGLEnum for GLdouble {
     #[inline(always)]
-    unsafe fn get_gl_enum() -> GLenum {
+    fn get_gl_type() -> GLenum {
         gl::DOUBLE
     }
 }
 
-impl HasGLEnum for GLint {
+unsafe impl HasGLEnum for GLint {
     #[inline(always)]
-    unsafe fn get_gl_enum() -> GLenum {
+    fn get_gl_type() -> GLenum {
         gl::INT
     }
 }
-impl HasGLEnum for GLuint {
+unsafe impl HasGLEnum for GLuint {
     #[inline(always)]
-    unsafe fn get_gl_enum() -> GLenum {
+    fn get_gl_type() -> GLenum {
         gl::UNSIGNED_INT
     }
 }
 
-impl HasGLEnum for GLshort {
+unsafe impl HasGLEnum for GLshort {
     #[inline(always)]
-    unsafe fn get_gl_enum() -> GLenum {
+    fn get_gl_type() -> GLenum {
         gl::SHORT
     }
 }
 
-impl HasGLEnum for GLushort {
+unsafe impl HasGLEnum for GLushort {
     #[inline(always)]
-    unsafe fn get_gl_enum() -> GLenum {
+    fn get_gl_type() -> GLenum {
         gl::UNSIGNED_SHORT
     }
 }
 
-impl HasGLEnum for GLubyte {
+unsafe impl HasGLEnum for GLubyte {
     #[inline(always)]
-    unsafe fn get_gl_enum() -> GLenum {
+    fn get_gl_type() -> GLenum {
         gl::UNSIGNED_BYTE
     }
 }
 
-impl HasGLEnum for GLbyte {
+unsafe impl HasGLEnum for GLbyte {
     #[inline(always)]
-    unsafe fn get_gl_enum() -> GLenum {
+    fn get_gl_type() -> GLenum {
         gl::BYTE
     }
 }
@@ -145,11 +152,10 @@ pub fn init(win: WindowedContext<NotCurrent>) -> Option<WindowedContext<Possibly
 
         gl::PixelStorei(gl::UNPACK_ALIGNMENT, 1);
         gl::PixelStorei(gl::PACK_ALIGNMENT, 1);
-        Some(w)
     }
+    Some(w)
 }
 
-#[inline]
 pub fn format_to_gl_internal_format(bpc: u8, format: GLenum) -> Option<(GLint, u8)> {
     let cpp: u8 = match format {
         gl::RED => 1,
@@ -178,10 +184,7 @@ pub fn format_to_gl_internal_format(bpc: u8, format: GLenum) -> Option<(GLint, u
 
         _ => return None,
     };
-    Some((
-        internal_format
-            .try_into()
-            .expect("FATAL Failure, faulty opengl implementation!"),
-        cpp,
-    ))
+    let internal_format: i32 = unwrap_result_or_ret!(internal_format.try_into(), None);
+
+    Some((internal_format, cpp))
 }
