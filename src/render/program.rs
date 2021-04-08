@@ -1,11 +1,45 @@
 use crate::render::shader::*;
 use crate::unwrap_result_or_ret;
 use gl::types::*;
-use std::collections::HashMap;
+use std::{cell::RefCell, collections::HashMap, ops::{Deref, DerefMut}};
 use std::convert::{TryFrom, TryInto};
 use std::ffi::CString;
 use std::ptr;
 use std::str;
+
+// Only one program can be bound at a time
+const BOUNCER:  RefCell<bool> = RefCell::new(false);
+
+
+pub struct BoundProgram<'a>(&'a mut Program);
+
+impl Deref for BoundProgram<'_>{
+    type Target = Program;
+    fn deref(&self) -> &Self::Target { &self.0 }
+}
+
+impl DerefMut for BoundProgram<'_>{
+    fn deref_mut(&mut self) -> &mut Self::Target { &mut self.0 }
+}
+
+impl Drop for BoundProgram<'_>{
+    fn drop(&mut self){ *(BOUNCER.borrow_mut()) = false; }
+}
+
+pub struct UnboundProgram(Program);
+
+impl UnboundProgram{
+
+    pub fn bind(&mut self) -> Option<BoundProgram>{
+        if *(BOUNCER.borrow()) == false{
+            *(BOUNCER.borrow_mut()) = true;
+            self.0.bind_program();
+            Some(BoundProgram(&mut self.0))
+        } else {
+            None
+        }
+    }
+}
 
 pub struct Program {
     id: GLuint,
@@ -24,7 +58,7 @@ impl Drop for Program {
 }
 
 impl Program {
-    pub fn new(shaders: &[&ShaderBase]) -> Result<Self, String> {
+    pub fn new(shaders: &[&ShaderBase]) -> Result<UnboundProgram, String> {
         let r = Program {
             id: unsafe { gl::CreateProgram() },
             uniform_ids: HashMap::new(),
@@ -71,10 +105,10 @@ impl Program {
         shaders
             .iter()
             .for_each(|s| unsafe { gl::DetachShader(r.id, s.get_id()) });
-        Ok(r)
+        Ok(UnboundProgram(r))
     }
 
-    pub fn bind_program(self: &Self) {
+    fn bind_program(self: &Self) {
         unsafe {
             gl::UseProgram(self.id);
         }

@@ -23,5 +23,9 @@ lto=true
 [dev-dependencies]
 image = "*"
 
+[[example]]
+name = "simple"
+
+
 
 

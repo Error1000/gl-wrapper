@@ -83,7 +83,7 @@ fn main() {
         program::Program::new(&[&vs.into(), &fs.into()]).unwrap()
     };
 
-    program.bind_program();
+    let mut program = program.bind().expect("Bind program");
     program.auto_load_all(30).unwrap();
     println!("Done!");
 
