@@ -2,7 +2,7 @@ extern crate gl_wrapper;
 extern crate glutin;
 extern crate image;
 
-use gl_wrapper::render::{program, shader, texture::{self, TextureFunc}};
+use gl_wrapper::render::{program, shader, texture};
 use gl_wrapper::util::buffer_obj::BOFunc;
 use gl_wrapper::util::*;
 use gl_wrapper::HasGLEnum;
@@ -90,7 +90,7 @@ fn main() {
     // Load textures
     println!("Loading textures ...");
 
-    let t = {
+    let mut t = {
         let im = image::open(&Path::new("apple.png"))
             .expect("Reading textures!")
             .into_rgba();
@@ -104,7 +104,7 @@ fn main() {
         )
         .expect("Creating textures.")
     };
-    t.bind_texture_for_sampling(program.get_sampler_id("obj_tex").unwrap());
+    t.bind_for_sampling(program.get_sampler_id("obj_tex").unwrap() as usize);
 
     println!("Done!");
 
