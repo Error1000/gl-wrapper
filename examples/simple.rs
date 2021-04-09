@@ -2,8 +2,7 @@ extern crate gl_wrapper;
 extern crate glutin;
 extern crate image;
 
-use gl_wrapper::render::texture::TextureFunc;
-use gl_wrapper::render::*;
+use gl_wrapper::render::{program, shader, texture::{self, TextureFunc}};
 use gl_wrapper::util::buffer_obj::BOFunc;
 use gl_wrapper::util::*;
 use gl_wrapper::HasGLEnum;
