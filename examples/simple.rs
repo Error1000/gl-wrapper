@@ -55,6 +55,7 @@ void main() {
 }";
 
 fn main() {
+
     let mut events_loop = EventLoop::new();
     let window = WindowBuilder::new()
         .with_inner_size(PhysicalSize {
@@ -69,7 +70,13 @@ fn main() {
 
     // Load the OpenGL function pointers
     let gl_window = gl_wrapper::init(gl_window).expect("Acquiring gl context!");
+    let mut max_combined_texture_image_units: GLint = 0;
 
+    unsafe{
+        gl::GetIntegerv(gl::MAX_COMBINED_TEXTURE_IMAGE_UNITS, &mut max_combined_texture_image_units);
+    }
+    println!("Units: {}", max_combined_texture_image_units);
+    
     println!("Window created but hidden!");
     println!("OpenGL Version: {}", gl_wrapper::get_gl_version_str());
 
@@ -113,8 +120,10 @@ fn main() {
     let mut a = aggregator_obj::VAO::new();
     a.bind_ao();
 
-    let pos_vbo = buffer_obj::VBO::<GLfloat>::with_data(&[2], &VERTEX_DATA, gl::STATIC_DRAW)
+    let mut pos_vbo = buffer_obj::VBO::<GLfloat>::with_data(&[2], &VERTEX_DATA, gl::STATIC_DRAW)
         .expect("Uploading pos data to vbo!");
+{
+    let pos_vbo = pos_vbo.bind().expect("Binding pos_vbo!");
     a.attach_bound_vbo_to_bound_vao(
         &pos_vbo,
         program.get_attribute_id("position").unwrap(),
@@ -122,9 +131,11 @@ fn main() {
         false,
     )
     .expect("Attaching pos vbo to vao!");
-
-    let tex_vbo = buffer_obj::VBO::<GLfloat>::with_data(&[2], &TEX_DATA, gl::STATIC_DRAW)
+}
+    let mut tex_vbo = buffer_obj::VBO::<GLfloat>::with_data(&[2], &TEX_DATA, gl::STATIC_DRAW)
         .expect("Uploading tex data to vbo!");
+{
+    let tex_vbo = tex_vbo.bind().expect("Binding tex_vbo");
     a.attach_bound_vbo_to_bound_vao(
         &tex_vbo,
         program.get_attribute_id("tex_coord").unwrap(),
@@ -132,7 +143,7 @@ fn main() {
         false,
     )
     .expect("Attaching tex vbo to vao!");
-
+}
     a.adapt_bound_vao_to_program(&program)
         .expect("Linking shader attributes to vao data!");
 

@@ -1,17 +1,15 @@
 use crate::render::shader::*;
 use crate::unwrap_result_or_ret;
 use gl::types::*;
-use std::{cell::RefCell, collections::HashMap, ops::{Deref, DerefMut}};
+use std::{collections::HashMap, ops::{Deref, DerefMut}, sync::{Mutex, MutexGuard}};
 use std::convert::{TryFrom, TryInto};
 use std::ffi::CString;
 use std::ptr;
 use std::str;
 
-// Only one program can be bound at a time
-const BOUNCER:  RefCell<bool> = RefCell::new(false);
+lazy_static!{ static ref BOUNCER: Mutex<()> = Mutex::new(()); }
 
-
-pub struct BoundProgram<'a>(&'a mut Program);
+pub struct BoundProgram<'a>(&'a mut Program, MutexGuard<'a, ()>);
 
 impl Deref for BoundProgram<'_>{
     type Target = Program;
@@ -22,22 +20,20 @@ impl DerefMut for BoundProgram<'_>{
     fn deref_mut(&mut self) -> &mut Self::Target { &mut self.0 }
 }
 
-impl Drop for BoundProgram<'_>{
-    fn drop(&mut self){ *(BOUNCER.borrow_mut()) = false; }
-}
 
 pub struct UnboundProgram(Program);
 
 impl UnboundProgram{
 
     pub fn bind(&mut self) -> Option<BoundProgram>{
-        if *(BOUNCER.borrow()) == false{
-            *(BOUNCER.borrow_mut()) = true;
             self.0.bind_program();
-            Some(BoundProgram(&mut self.0))
-        } else {
-            None
-        }
+            Some(BoundProgram(
+                &mut self.0,
+                match BOUNCER.try_lock(){
+                    Ok(v) => v,
+                    Err(_) => return None
+                }
+            ))
     }
 }
 

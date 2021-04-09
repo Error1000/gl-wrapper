@@ -8,6 +8,8 @@ edition = "2018"
 [dependencies]
 gl = "*"
 glutin = "*"
+lazy_static = "*"
+bitvec = "*"
 
 [build-dependencies]
 gl_generator = "*"

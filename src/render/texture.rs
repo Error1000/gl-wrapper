@@ -1,13 +1,16 @@
 use crate::unwrap_option_or_ret;
 use crate::unwrap_result_or_ret;
 use crate::HasGLEnum;
+use bitvec::prelude::*;
 use gl::types::*;
-use std::{cell::RefCell, convert::TryInto, ops::{Deref, DerefMut}};
+use std::{convert::TryInto, ops::{Deref, DerefMut}, sync::RwLock};
 
 
-// Only one program can be bound at a time
-const BOUNCER:  RefCell<[bool; gl::MAX_COMBINED_TEXTURE_IMAGE_UNITS as usize]> = RefCell::new([false; gl::MAX_COMBINED_TEXTURE_IMAGE_UNITS as usize]);
-const LAST_UNIT: RefCell<usize> = RefCell::new(0);
+lazy_static!{
+    static ref BOUNCER: RwLock<BitArr!(for 256, in Msb0, usize)>  = RwLock::new(bitarr![Msb0, usize; 0; 256]);
+    static ref LAST_UNIT: RwLock<usize> = RwLock::new(0);
+}
+
 
 pub struct BoundTexture<'a, const N: usize, const TYP: GLenum>(&'a mut TextureBase<N, TYP>, usize);
 
@@ -21,7 +24,13 @@ impl<const N: usize, const TYP: GLenum> DerefMut for BoundTexture<'_, N, TYP>{
 }
 
 impl<const N: usize, const TYP: GLenum> Drop for BoundTexture<'_, N, TYP>{
-    fn drop(&mut self){ BOUNCER.borrow_mut()[self.1] = false; }
+    fn drop(&mut self) {
+        let mut bl = match BOUNCER.write(){
+            Ok(v) => v,
+            Err(_) => panic!()
+        };
+        bl.set(self.1, false);
+    }
 }
 
 pub struct UnboundTexture<const N: usize, const TYP: GLenum>(TextureBase<N, TYP>);
@@ -29,24 +38,31 @@ pub struct UnboundTexture<const N: usize, const TYP: GLenum>(TextureBase<N, TYP>
 impl<const N: usize, const TYP: GLenum> UnboundTexture<N, TYP>{
 
     pub fn bind_for_data(&mut self) -> Option<BoundTexture<N, TYP>>{
-        let lu = *LAST_UNIT.borrow();
-        if BOUNCER.borrow()[lu] == false{
-            BOUNCER.borrow_mut()[lu] = true;
-            self.0.bind_texture_for_data();
-            Some(BoundTexture(&mut self.0, lu))
-        } else {
-            None
+        let lu = match LAST_UNIT.try_read(){
+            Ok(v) => v,
+            Err(_) => return None,
+        };
+        if unwrap_result_or_ret!(BOUNCER.try_read(), None)[*lu] == false{
+                unwrap_result_or_ret!(BOUNCER.try_write(), None).set(*lu, true);
+                self.0.bind_texture_for_data();
+                Some(BoundTexture( &mut self.0, *lu))
+        }else{
+                None
         }
     }
 
     pub fn bind_for_sampling(&mut self, sampler_id: usize) -> Option<BoundTexture<N, TYP>>{
-        if BOUNCER.borrow()[sampler_id] == false{
-            BOUNCER.borrow_mut()[sampler_id] = true;
-            *(LAST_UNIT.borrow_mut()) = sampler_id;
-            self.0.bind_texture_for_sampling(sampler_id.try_into().expect("Converting input value to opengl value!"));
-            Some(BoundTexture(&mut self.0, sampler_id))
-        } else {
-            None
+        if unwrap_result_or_ret!(BOUNCER.try_read(), None)[sampler_id] == false{
+                unwrap_result_or_ret!(BOUNCER.try_write(), None).set(sampler_id, true);
+                let mut lu = match LAST_UNIT.write(){
+                    Ok(v) => v,
+                    Err(_) => return None
+                };
+                *lu = sampler_id;
+                self.0.bind_texture_for_sampling(sampler_id.try_into().expect("Converting input value to opengl value!"));
+                Some(BoundTexture( &mut self.0, sampler_id))
+        }else{
+                None
         }
     }
 }

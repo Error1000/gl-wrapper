@@ -1,8 +1,39 @@
 use crate::{unwrap_result_or_ret, HasGLEnum};
 use gl::types::*;
-use std::convert::TryFrom;
+use std::{convert::TryFrom, ops::{Deref, DerefMut}, sync::{Mutex, MutexGuard}};
 use std::marker::PhantomData;
 use std::mem::size_of;
+
+
+lazy_static!{ static ref BOUNCER: Mutex<()> = Mutex::new(()); }
+
+pub struct BoundVBO<'a, 'b, ET>(&'a mut VBO<'b, ET>, MutexGuard<'a, ()>);
+
+impl<'b, ET> Deref for BoundVBO<'_, 'b, ET>{
+    type Target = VBO<'b, ET>;
+    fn deref(&self) -> &Self::Target { &self.0 }
+}
+
+impl<ET> DerefMut for BoundVBO<'_, '_, ET>{
+    fn deref_mut(&mut self) -> &mut Self::Target { &mut self.0 }
+}
+
+
+pub struct UnboundVBO<'b, ET>(VBO<'b, ET>);
+
+impl<'a,'b, ET> UnboundVBO<'b, ET>{
+    pub fn bind(&'a mut self) -> Option<BoundVBO<'a,'b, ET>>{   
+        self.0.bind_bo();
+        Some(BoundVBO(
+            &mut self.0,
+            match BOUNCER.try_lock(){
+                Ok(v) => v,
+                Err(_) => return None
+            }
+        ))
+    }
+}
+
 
 pub struct BOBase<ET> {
     id: GLuint,
@@ -38,15 +69,18 @@ impl<ET> Drop for BOBase<ET> {
 pub struct VBO<'a, ET>(BOBase<ET>, &'a [u8]);
 pub struct IBO<ET>(BOBase<ET>);
 
-impl<'a, ET> VBO<'a, ET> {
-    pub fn new(elem_per_vert: &'a [u8]) -> Self {
-        VBO::<ET>(BOBase::<ET>::new(), elem_per_vert)
+impl<'a, ET: 'a> VBO<'a, ET> {
+    pub fn new(elem_per_vert: &'a [u8]) -> UnboundVBO<'a, ET> {
+        UnboundVBO(VBO::<ET>(BOBase::<ET>::new(), elem_per_vert))
     }
 
-    pub fn with_data(elem_per_vert: &'a [u8], data: &[ET], usage: GLenum) -> Result<Self, String> {
+    pub fn with_data(elem_per_vert: &'a [u8], data: &[ET], usage: GLenum) -> Result<UnboundVBO<'a, ET>, String> {
         let mut r = Self::new(elem_per_vert);
-        r.bind_bo();
-        r.upload_to_bound_bo(data, usage)?;
+        {
+            let mut r = r.bind().expect("Binding vbo!");
+            r.upload_to_bound_bo(data, usage)?;
+            drop(r);
+        }
         Ok(r)
     }
 
