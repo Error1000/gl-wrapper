@@ -54,7 +54,11 @@ void main() {
     out_color = texture2D(obj_tex, pass_tex_coord);
 }";
 
+
 fn main() {
+    let mut vbo_bouncer = buffer_obj::vbo_binder::BOUNCER::new().expect("Creating vbo bouncer");
+    let mut prog_bouncer = program::program_binder::BOUNCER::new().expect("Creating program bouncer");
+
 
     let mut events_loop = EventLoop::new();
     let window = WindowBuilder::new()
@@ -89,7 +93,7 @@ fn main() {
         program::Program::new(&[&vs.into(), &fs.into()]).unwrap()
     };
 
-    let mut program = program.bind().expect("Bind program");
+    let mut program = program.bind(&mut prog_bouncer);
     program.auto_load_all(30).unwrap();
     println!("Done!");
 
@@ -120,10 +124,10 @@ fn main() {
     let mut a = aggregator_obj::VAO::new();
     a.bind_ao();
 
-    let mut pos_vbo = buffer_obj::VBO::<GLfloat>::with_data(&[2], &VERTEX_DATA, gl::STATIC_DRAW)
+    let mut pos_vbo = buffer_obj::VBO::<GLfloat>::with_data(&mut vbo_bouncer,&[2], &VERTEX_DATA, gl::STATIC_DRAW)
         .expect("Uploading pos data to vbo!");
 {
-    let pos_vbo = pos_vbo.bind().expect("Binding pos_vbo!");
+    let pos_vbo = pos_vbo.bind(&mut vbo_bouncer);
     a.attach_bound_vbo_to_bound_vao(
         &pos_vbo,
         program.get_attribute_id("position").unwrap(),
@@ -132,10 +136,10 @@ fn main() {
     )
     .expect("Attaching pos vbo to vao!");
 }
-    let mut tex_vbo = buffer_obj::VBO::<GLfloat>::with_data(&[2], &TEX_DATA, gl::STATIC_DRAW)
+    let mut tex_vbo = buffer_obj::VBO::<GLfloat>::with_data(&mut vbo_bouncer, &[2], &TEX_DATA, gl::STATIC_DRAW)
         .expect("Uploading tex data to vbo!");
 {
-    let tex_vbo = tex_vbo.bind().expect("Binding tex_vbo");
+    let tex_vbo = tex_vbo.bind(&mut vbo_bouncer);
     a.attach_bound_vbo_to_bound_vao(
         &tex_vbo,
         program.get_attribute_id("tex_coord").unwrap(),

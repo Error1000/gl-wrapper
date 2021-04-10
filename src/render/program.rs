@@ -1,40 +1,73 @@
 use crate::render::shader::*;
 use crate::unwrap_result_or_ret;
 use gl::types::*;
-use std::{collections::HashMap, ops::{Deref, DerefMut}, sync::{Mutex, MutexGuard}};
+use std::collections::HashMap;
 use std::convert::{TryFrom, TryInto};
 use std::ffi::CString;
 use std::ptr;
 use std::str;
 
-lazy_static!{ static ref BOUNCER: Mutex<()> = Mutex::new(()); }
-
-pub struct BoundProgram<'a>(&'a mut Program, MutexGuard<'a, ()>);
-
-impl Deref for BoundProgram<'_>{
-    type Target = Program;
-    fn deref(&self) -> &Self::Target { &self.0 }
-}
-
-impl DerefMut for BoundProgram<'_>{
-    fn deref_mut(&mut self) -> &mut Self::Target { &mut self.0 }
-}
-
-
-pub struct UnboundProgram(Program);
-
-impl UnboundProgram{
-
-    pub fn bind(&mut self) -> Option<BoundProgram>{
-            self.0.bind_program();
-            Some(BoundProgram(
-                &mut self.0,
-                match BOUNCER.try_lock(){
-                    Ok(v) => v,
-                    Err(_) => return None
-                }
-            ))
+impl program_binder::OnBind for Program{
+    fn on_bind(&mut self) {
+        self.bind_program();
     }
+}
+
+pub mod program_binder{
+
+    type Usable<> = super::Program<>;
+    
+    pub trait OnBind{
+        fn on_bind(&mut self);
+    }
+    
+    use std::ops::{Deref, DerefMut};
+    use once_cell::sync::OnceCell;
+    
+    
+    static BOUNCER_GUARD: OnceCell<()> = OnceCell::new(); // BOUNCER_GUARD is private, this is important because we don't want somebody take()-ing the intialised OnceCell, leaving it uninitialised, and being able to call new() again on BOUNCER again and have two BOUNCERs
+    
+    pub struct BOUNCER(()); // NOTE: () is private, this is important so that the only way to get a BOUNCER instance is to use new()
+    
+    impl BOUNCER{
+        /// IMPORTANT: Only one bouncer can exist ever
+        /// SAFETY: We are the only ones who can access BOUNCER_GUARD because it is private and we can use that to make sure that we only create one BOUNCER ever
+        pub fn new() -> Option<Self>{
+            if BOUNCER_GUARD.get().is_none(){
+                BOUNCER_GUARD.set(()).unwrap();
+                Some(BOUNCER(()))
+            }else{ None }
+    
+        }
+    }
+    
+    // Because there only ever exists one bouncer a &mut to a BOUNCER must be unique, so thre can only ever exist one Bound
+    pub struct Bound<'a, >(&'a mut Usable<>, &'a mut BOUNCER);
+    
+    impl<> Deref for Bound<'_, >{
+        type Target = Usable<>;
+    
+        #[inline]
+        fn deref(&self) -> &Self::Target { &self.0 }
+    }
+    
+    impl<> DerefMut for Bound<'_, >{
+        #[inline]
+        fn deref_mut(&mut self) -> &mut Self::Target { &mut self.0 }
+    }
+    
+    pub struct Unbound<>(Usable<>) where Usable<>: OnBind; // Usable is private, this is important because it means to get a Usable you must go through bind which goes through a Bound which requires a &mut BOUNCER, whichs is unique, so no matter how many Unbound there are, there will only ever be one Bound at a time
+    
+    impl<> Unbound<> {
+        #[inline]
+        pub fn from(val: Usable<>) -> Unbound<> { Unbound(val) } // Takes a Usable and makes it an Unbound, this is fine since Usable can control how it's constructed and return an Unbound(Usable) instead of a Usable so there is no way a normal user can make a Usable without it being Unbound
+        #[inline]
+        pub fn bind<'a>(&'a mut self, bn: &'a mut BOUNCER) -> Bound<'a, > {
+            self.0.on_bind();
+            Bound(&mut self.0, bn)
+        }
+    }
+    
 }
 
 pub struct Program {
@@ -54,7 +87,7 @@ impl Drop for Program {
 }
 
 impl Program {
-    pub fn new(shaders: &[&ShaderBase]) -> Result<UnboundProgram, String> {
+    pub fn new(shaders: &[&ShaderBase]) -> Result<program_binder::Unbound, String> {
         let r = Program {
             id: unsafe { gl::CreateProgram() },
             uniform_ids: HashMap::new(),
@@ -101,7 +134,7 @@ impl Program {
         shaders
             .iter()
             .for_each(|s| unsafe { gl::DetachShader(r.id, s.get_id()) });
-        Ok(UnboundProgram(r))
+        Ok(program_binder::Unbound::from(r))
     }
 
     fn bind_program(self: &Self) {

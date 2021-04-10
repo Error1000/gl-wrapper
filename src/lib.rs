@@ -1,3 +1,6 @@
+#[macro_use]
+extern crate lazy_static;
+
 use gl::types::*;
 use glutin::PossiblyCurrent;
 use glutin::{NotCurrent, WindowedContext};
@@ -6,9 +9,6 @@ use std::ffi::CStr;
 
 pub mod render;
 pub mod util;
-
-#[macro_use]
-extern crate lazy_static;
 
 #[macro_export]
 macro_rules! unwrap_result_or_ret {
