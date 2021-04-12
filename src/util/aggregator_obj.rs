@@ -7,6 +7,94 @@ use std::convert::TryFrom;
 use std::mem::size_of;
 use std::ptr;
 
+impl vao_binder::OnBind for VAO{
+    fn on_bind<const BI: usize>(&mut self) {
+        self.bind_ao();
+    }
+}
+
+pub type BoundVAO<'a> = vao_binder::Bound<'a, 0>;
+pub type UnboundVAO = vao_binder::Unbound;
+pub type VAOBouncer = vao_binder::BOUNCER<0>;
+
+mod vao_binder {
+    const NBOUNCERS: usize = 1;
+    type Usable = super::VAO;
+
+    pub trait OnBind {
+        fn on_bind<const BI: usize>(&mut self);
+    }
+
+    use bitvec::prelude::*;
+    use std::{
+        ops::{Deref, DerefMut},
+        sync::{atomic::AtomicUsize, Mutex},
+    };
+
+    lazy_static! {
+        static ref BOUNCER_GUARD: Mutex<BitArr!(for NBOUNCERS, in Msb0, u8)> = Mutex::new(BitArray::zeroed()); // BOUNCER_GUARD is private, this is important because we don't want somebody take()-ing the intialised OnceCell, leaving it uninitialised, and being able to call new() again on BOUNCER again and have two BOUNCERs
+        /// SAFTEY: LAST_BOUND is unreliable, don't rely on it for correctness
+        pub static ref LAST_BOUND: AtomicUsize = AtomicUsize::new(0);
+    }
+
+    pub struct BOUNCER<const BI: usize>(()); // NOTE: () is private, this is important so that the only way to get a BOUNCER instance is to use new()
+
+    impl<const BI: usize> BOUNCER<BI> {
+        /// IMPORTANT: Only one bouncer can exist ever
+        /// SAFETY: We are the only ones who can access BOUNCER_GUARD because it is private and we can use that to make sure that we only create one BOUNCER ever
+        #[inline]
+        pub fn new() -> Option<Self> {
+            if BI >= NBOUNCERS {
+                return None;
+            }
+            let mut lck = BOUNCER_GUARD.try_lock().ok()?;
+            if lck.get(BI).unwrap() == false {
+                lck.set(BI, true);
+                Some(BOUNCER(()))
+            } else {
+                None
+            }
+        }
+    }
+
+    // Because there only ever exists one bouncer a &mut to a BOUNCER must be unique, so thre can only ever exist one Bound
+    pub struct Bound<'a, const BI: usize>(&'a mut Usable, &'a mut BOUNCER<BI>);
+
+    impl<const BI: usize> Deref for Bound<'_, BI> {
+        type Target = Usable;
+
+        #[inline]
+        fn deref(&self) -> &Self::Target {
+            &self.0
+        }
+    }
+
+    impl<const BI: usize> DerefMut for Bound<'_, BI> {
+        #[inline]
+        fn deref_mut(&mut self) -> &mut Self::Target {
+            &mut self.0
+        }
+    }
+
+    pub struct Unbound(Usable)
+    where
+        Usable: OnBind; // Usable is private, this is important because it means to get a Usable you must go through bind which goes through a Bound which requires a &mut BOUNCER, whichs is unique, so no matter how many Unbound there are, there will only ever be one Bound at a time
+
+    impl Unbound {
+        #[inline]
+        pub fn from(val: Usable) -> Unbound {
+            Unbound(val)
+        } // Takes a Usable and makes it an Unbound, this is fine since Usable can control how it's constructed and return an Unbound(Usable) instead of a Usable so there is no way a normal user can make a Usable without it being Unbound
+        #[inline]
+        pub fn bind<'a, const BI: usize>(&'a mut self, bn: &'a mut BOUNCER<BI>) -> Bound<'a, BI> {
+            self.0.on_bind::<BI>();
+            LAST_BOUND.store(BI, core::sync::atomic::Ordering::Relaxed);
+            Bound(&mut self.0, bn)
+        }
+    }
+}
+
+
 pub struct VAO {
     id: GLuint,
     available_ind: Vec<GLuint>,
@@ -21,7 +109,7 @@ impl Drop for VAO {
 }
 
 impl VAO {
-    pub fn new() -> Self {
+    pub fn new() -> UnboundVAO {
         let mut r = VAO {
             id: 0,
             available_ind: Vec::new(),
@@ -29,16 +117,16 @@ impl VAO {
         unsafe {
             gl::GenVertexArrays(1, &mut (r.id));
         }
-        r
+        UnboundVAO::from(r)
     }
 
-    pub fn bind_ao(self: &Self) {
+    fn bind_ao(self: &Self) {
         unsafe {
             gl::BindVertexArray(self.id);
         }
     }
 
-    pub fn adapt_bound_vao_to_program(self: &mut Self, p: &program::Program) -> Result<(), ()> {
+    pub fn adapt_vao_to_program(self: &mut Self, p: &program::Program) -> Result<(), ()> {
         for l in p.get_attribute_hashmap().values() {
             // If the data index the program needs has not been attached throw error so it is
             // impossible to cause undefined behaviour
@@ -56,7 +144,7 @@ impl VAO {
     /// gpus can only work with f32,
     /// however this dosen't actually convert the VBO
     /// it just sets a flag that tells the gpu to convert to f32
-    pub fn attach_bound_vbo_to_bound_vao<ET>(
+    pub fn attach_vbo_to_vao<ET>(
         self: &mut Self,
         bo: &buffer_obj::VBO<ET>,
         index: GLuint,

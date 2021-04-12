@@ -54,10 +54,14 @@ void main() {
     out_color = texture2D(obj_tex, pass_tex_coord);
 }";
 
-
 fn main() {
-    let mut vbo_bouncer = buffer_obj::vbo_binder::BOUNCER::new().expect("Creating vbo bouncer");
-    let mut prog_bouncer = program::program_binder::BOUNCER::new().expect("Creating program bouncer");
+    let mut vbo_bouncer = buffer_obj::VBOBouncer::new().expect("Creating vbo bouncer");
+    let mut ibo_bouncer = buffer_obj::IBOBouncer::new().expect("Creating ibo bouncer!");
+    let mut prog_bouncer =
+        program::ProgramBouncer::new().expect("Creating program bouncer");
+
+    let mut vao_bouncer = aggregator_obj::VAOBouncer::new().expect("Creating vao bouncer!");
+    let mut texunit0_bouncer = texture::TextureBouncer::<0>::new().expect("Creating tex unit 0 bouncer");
 
 
     let mut events_loop = EventLoop::new();
@@ -76,11 +80,14 @@ fn main() {
     let gl_window = gl_wrapper::init(gl_window).expect("Acquiring gl context!");
     let mut max_combined_texture_image_units: GLint = 0;
 
-    unsafe{
-        gl::GetIntegerv(gl::MAX_COMBINED_TEXTURE_IMAGE_UNITS, &mut max_combined_texture_image_units);
+    unsafe {
+        gl::GetIntegerv(
+            gl::MAX_COMBINED_TEXTURE_IMAGE_UNITS,
+            &mut max_combined_texture_image_units,
+        );
     }
     println!("Units: {}", max_combined_texture_image_units);
-    
+
     println!("Window created but hidden!");
     println!("OpenGL Version: {}", gl_wrapper::get_gl_version_str());
 
@@ -106,6 +113,7 @@ fn main() {
             .expect("Reading textures!")
             .into_rgba();
         texture::Texture2D::with_data(
+            &mut texunit0_bouncer,
             [
                 im.width().try_into().unwrap(),
                 im.height().try_into().unwrap(),
@@ -115,44 +123,53 @@ fn main() {
         )
         .expect("Creating textures.")
     };
-    t.bind_for_sampling(program.get_sampler_id("obj_tex").unwrap() as usize);
+    let texid: usize = program.get_sampler_id("obj_tex").unwrap() as usize;
+    assert_eq!(texid, 0);
+    let _t = t.bind::<0>(&mut texunit0_bouncer);
 
     println!("Done!");
 
     // Load mesh data ( indices, vertices, uv data )
     println!("Loading mesh ...");
     let mut a = aggregator_obj::VAO::new();
-    a.bind_ao();
+    let mut a = a.bind( &mut vao_bouncer);
 
-    let mut pos_vbo = buffer_obj::VBO::<GLfloat>::with_data(&mut vbo_bouncer,&[2], &VERTEX_DATA, gl::STATIC_DRAW)
-        .expect("Uploading pos data to vbo!");
-{
+    let mut pos_vbo = buffer_obj::VBO::<GLfloat>::with_data(
+        &mut vbo_bouncer,
+        &[2],
+        &VERTEX_DATA,
+        gl::STATIC_DRAW,
+    )
+    .expect("Uploading pos data to vbo!");
+
     let pos_vbo = pos_vbo.bind(&mut vbo_bouncer);
-    a.attach_bound_vbo_to_bound_vao(
+    a.attach_vbo_to_vao(
         &pos_vbo,
         program.get_attribute_id("position").unwrap(),
         0,
         false,
     )
     .expect("Attaching pos vbo to vao!");
-}
-    let mut tex_vbo = buffer_obj::VBO::<GLfloat>::with_data(&mut vbo_bouncer, &[2], &TEX_DATA, gl::STATIC_DRAW)
-        .expect("Uploading tex data to vbo!");
-{
+
+    let mut tex_vbo =
+        buffer_obj::VBO::<GLfloat>::with_data(&mut vbo_bouncer, &[2], &TEX_DATA, gl::STATIC_DRAW)
+            .expect("Uploading tex data to vbo!");
+
     let tex_vbo = tex_vbo.bind(&mut vbo_bouncer);
-    a.attach_bound_vbo_to_bound_vao(
+    a.attach_vbo_to_vao(
         &tex_vbo,
         program.get_attribute_id("tex_coord").unwrap(),
         0,
         false,
     )
     .expect("Attaching tex vbo to vao!");
-}
-    a.adapt_bound_vao_to_program(&program)
+
+    a.adapt_vao_to_program(&program)
         .expect("Linking shader attributes to vao data!");
 
-    let ind_ibo = buffer_obj::IBO::<GLushort>::with_data(&IND_DATA, gl::STATIC_DRAW)
+    let mut ind_ibo = buffer_obj::IBO::<GLushort>::with_data(&mut ibo_bouncer, &IND_DATA, gl::STATIC_DRAW)
         .expect("Uploading indecies to ibo!");
+    let ind_ibo = ind_ibo.bind( &mut ibo_bouncer);
     println!("Done!");
 
     println!("Showing window!");

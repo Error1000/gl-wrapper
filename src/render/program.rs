@@ -7,34 +7,45 @@ use std::ffi::CString;
 use std::ptr;
 use std::str;
 
-impl program_binder::OnBind for Program{
-    fn on_bind(&mut self) {
+impl program_binder::OnBind for Program {
+    #[inline(always)]
+    fn on_bind<const BI: usize>(&mut self) {
         self.bind_program();
     }
 }
 
-pub mod program_binder{
+pub type ProgramBouncer = program_binder::BOUNCER<0>;
+pub type UnboundProgram = program_binder::Unbound;
+pub type BoundProgram<'a> = program_binder::Bound<'a, 0>;
 
+mod program_binder{
+    const NBOUNCERS: usize = 1;
     type Usable<> = super::Program<>;
     
     pub trait OnBind{
-        fn on_bind(&mut self);
+        fn on_bind<const BI: usize>(&mut self);
     }
     
-    use std::ops::{Deref, DerefMut};
-    use once_cell::sync::OnceCell;
+    use std::{ops::{Deref, DerefMut}, sync::{Mutex, atomic::AtomicUsize}};
+    use bitvec::prelude::*;
+
+    lazy_static!{
+        static ref BOUNCER_GUARD: Mutex<BitArr!(for NBOUNCERS, in Msb0, u8)> = Mutex::new(BitArray::zeroed()); // BOUNCER_GUARD is private, this is important because we don't want somebody take()-ing the intialised OnceCell, leaving it uninitialised, and being able to call new() again on BOUNCER again and have two BOUNCERs
+        /// SAFTEY: LAST_BOUND is unreliable, don't rely on it for correctness
+        pub static ref LAST_BOUND: AtomicUsize = AtomicUsize::new(0);
+    }
+
+    pub struct BOUNCER<const BI: usize>(()); // NOTE: () is private, this is important so that the only way to get a BOUNCER instance is to use new()
     
-    
-    static BOUNCER_GUARD: OnceCell<()> = OnceCell::new(); // BOUNCER_GUARD is private, this is important because we don't want somebody take()-ing the intialised OnceCell, leaving it uninitialised, and being able to call new() again on BOUNCER again and have two BOUNCERs
-    
-    pub struct BOUNCER(()); // NOTE: () is private, this is important so that the only way to get a BOUNCER instance is to use new()
-    
-    impl BOUNCER{
+    impl<const BI: usize> BOUNCER<BI>{
         /// IMPORTANT: Only one bouncer can exist ever
         /// SAFETY: We are the only ones who can access BOUNCER_GUARD because it is private and we can use that to make sure that we only create one BOUNCER ever
+        #[inline]
         pub fn new() -> Option<Self>{
-            if BOUNCER_GUARD.get().is_none(){
-                BOUNCER_GUARD.set(()).unwrap();
+            if BI >= NBOUNCERS{ return None; }
+            let mut lck = BOUNCER_GUARD.try_lock().ok()?;
+            if lck.get(BI).unwrap() == false{
+                lck.set(BI, true);
                 Some(BOUNCER(()))
             }else{ None }
     
@@ -42,16 +53,16 @@ pub mod program_binder{
     }
     
     // Because there only ever exists one bouncer a &mut to a BOUNCER must be unique, so thre can only ever exist one Bound
-    pub struct Bound<'a, >(&'a mut Usable<>, &'a mut BOUNCER);
+    pub struct Bound<'a, const BI: usize>(&'a mut Usable<>, &'a mut BOUNCER<BI>);
     
-    impl<> Deref for Bound<'_, >{
+    impl<const BI: usize> Deref for Bound<'_, BI>{
         type Target = Usable<>;
     
         #[inline]
         fn deref(&self) -> &Self::Target { &self.0 }
     }
     
-    impl<> DerefMut for Bound<'_, >{
+    impl<const BI: usize> DerefMut for Bound<'_, BI>{
         #[inline]
         fn deref_mut(&mut self) -> &mut Self::Target { &mut self.0 }
     }
@@ -62,8 +73,9 @@ pub mod program_binder{
         #[inline]
         pub fn from(val: Usable<>) -> Unbound<> { Unbound(val) } // Takes a Usable and makes it an Unbound, this is fine since Usable can control how it's constructed and return an Unbound(Usable) instead of a Usable so there is no way a normal user can make a Usable without it being Unbound
         #[inline]
-        pub fn bind<'a>(&'a mut self, bn: &'a mut BOUNCER) -> Bound<'a, > {
-            self.0.on_bind();
+        pub fn bind<'a, const BI: usize>(&'a mut self, bn: &'a mut BOUNCER<BI>) -> Bound<'a, BI> {
+            self.0.on_bind::<BI>();
+            LAST_BOUND.store(BI, core::sync::atomic::Ordering::Relaxed);
             Bound(&mut self.0, bn)
         }
     }
