@@ -10,6 +10,7 @@ gl = "*"
 glutin = "*"
 lazy_static = "*"
 bitvec = "*"
+one_user = "*"
 
 [build-dependencies]
 gl_generator = "*"

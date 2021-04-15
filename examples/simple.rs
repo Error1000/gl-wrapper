@@ -17,7 +17,6 @@ use glutin::event::{Event, WindowEvent};
 use glutin::event_loop::{ControlFlow, EventLoop};
 use glutin::window::WindowBuilder;
 
-use glutin::platform::desktop::EventLoopExtDesktop;
 use std::path::Path;
 use std::time::Instant;
 
@@ -55,16 +54,15 @@ void main() {
 }";
 
 fn main() {
-    let mut vbo_bouncer = buffer_obj::VBOBouncer::new().expect("Creating vbo bouncer");
-    let mut ibo_bouncer = buffer_obj::IBOBouncer::new().expect("Creating ibo bouncer!");
-    let mut prog_bouncer =
-        program::ProgramBouncer::new().expect("Creating program bouncer");
+    let mut vbo_bouncer = buffer_obj::VBOBouncer::new();
+    let mut ibo_bouncer = buffer_obj::IBOBouncer::new();
+    let mut prog_bouncer = program::ProgramBouncer::new();
 
-    let mut vao_bouncer = aggregator_obj::VAOBouncer::new().expect("Creating vao bouncer!");
-    let mut texunit0_bouncer = texture::TextureBouncer::<0>::new().expect("Creating tex unit 0 bouncer");
+    let mut vao_bouncer = aggregator_obj::VAOBouncer::new();
+    let mut texunit0_bouncer = texture::TextureBouncer::<0>::new();
 
 
-    let mut events_loop = EventLoop::new();
+    let events_loop = EventLoop::new();
     let window = WindowBuilder::new()
         .with_inner_size(PhysicalSize {
             width: 400.0,
@@ -111,7 +109,7 @@ fn main() {
     let mut t = {
         let im = image::open(&Path::new("apple.png"))
             .expect("Reading textures!")
-            .into_rgba();
+            .into_rgba8();
         texture::Texture2D::with_data(
             &mut texunit0_bouncer,
             [
@@ -185,7 +183,7 @@ fn main() {
 
     let mut t = Instant::now();
     // Note we use run-return to make sure that everything gets dropped ( although run also works )
-    events_loop.run_return(|event, _, control_flow| {
+    events_loop.run(move |event, _, control_flow| {
         // Set default for control_flow
         *control_flow = ControlFlow::Poll;
         match event {

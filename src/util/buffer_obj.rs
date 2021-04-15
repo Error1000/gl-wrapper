@@ -3,8 +3,8 @@ use gl::types::*;
 use std::convert::TryFrom;
 use std::marker::PhantomData;
 use std::mem::size_of;
+use one_user::one_user;
 
-/**********************************************************/
 impl<'b, ET> vbo_binder::OnBind for VBO<'b, ET> {
     #[inline(always)]
     fn on_bind<const BI: usize>(&mut self) {
@@ -12,167 +12,11 @@ impl<'b, ET> vbo_binder::OnBind for VBO<'b, ET> {
     }
 }
 
-pub type VBOBouncer = vbo_binder::BOUNCER<0>;
-pub type BoundVBO<'a, 'b, ET> = vbo_binder::Bound<'a, 'b, ET, 0>;
-pub type UnboundVBO<'b, ET>   = vbo_binder::Unbound<'b, ET>;
-
-mod vbo_binder{
-    const NBOUNCERS: usize = 1;
-    type Usable<'b, ET> = super::VBO<'b, ET>;
-    
-    pub trait OnBind{
-        fn on_bind<const BI: usize>(&mut self);
-    }
-    
-    use std::{ops::{Deref, DerefMut}, sync::{Mutex, atomic::AtomicUsize}};
-    use bitvec::prelude::*;
-
-    lazy_static!{
-        static ref BOUNCER_GUARD: Mutex<BitArr!(for NBOUNCERS, in Msb0, u8)> = Mutex::new(BitArray::zeroed()); // BOUNCER_GUARD is private, this is important because we don't want somebody take()-ing the intialised OnceCell, leaving it uninitialised, and being able to call new() again on BOUNCER again and have two BOUNCERs
-        /// SAFTEY: LAST_BOUND is unreliable, don't rely on it for correctness
-        pub static ref LAST_BOUND: AtomicUsize = AtomicUsize::new(0);
-    }
-
-    pub struct BOUNCER<const BI: usize>(()); // NOTE: () is private, this is important so that the only way to get a BOUNCER instance is to use new()
-    
-    impl<const BI: usize> BOUNCER<BI>{
-        /// IMPORTANT: Only one bouncer can exist ever
-        /// SAFETY: We are the only ones who can access BOUNCER_GUARD because it is private and we can use that to make sure that we only create one BOUNCER ever
-        #[inline]
-        pub fn new() -> Option<Self>{
-            if BI >= NBOUNCERS{ return None; }
-            let mut lck = BOUNCER_GUARD.try_lock().ok()?;
-            if lck.get(BI).unwrap() == false{
-                lck.set(BI, true);
-                Some(BOUNCER(()))
-            }else{ None }
-    
-        }
-    }
-    
-    // Because there only ever exists one bouncer a &mut to a BOUNCER must be unique, so thre can only ever exist one Bound
-    pub struct Bound<'a, 'b, ET, const BI: usize>(&'a mut Usable<'b, ET>, &'a mut BOUNCER<BI>);
-    
-    impl<'b, ET, const BI: usize> Deref for Bound<'_, 'b, ET, BI>{
-        type Target = Usable<'b, ET>;
-    
-        #[inline]
-        fn deref(&self) -> &Self::Target { &self.0 }
-    }
-    
-    impl<'b, ET, const BI: usize> DerefMut for Bound<'_, 'b, ET, BI>{
-        #[inline]
-        fn deref_mut(&mut self) -> &mut Self::Target { &mut self.0 }
-    }
-    
-    pub struct Unbound<'b, ET>(Usable<'b, ET>) where Usable<'b, ET>: OnBind; // Usable is private, this is important because it means to get a Usable you must go through bind which goes through a Bound which requires a &mut BOUNCER, whichs is unique, so no matter how many Unbound there are, there will only ever be one Bound at a time
-    
-    impl<'b, ET> Unbound<'b, ET> {
-        #[inline]
-        pub fn from(val: Usable<'b, ET>) -> Unbound<'b, ET> { Unbound(val) } // Takes a Usable and makes it an Unbound, this is fine since Usable can control how it's constructed and return an Unbound(Usable) instead of a Usable so there is no way a normal user can make a Usable without it being Unbound
-        #[inline]
-        pub fn bind<'a, const BI: usize>(&'a mut self, bn: &'a mut BOUNCER<BI>) -> Bound<'a, 'b, ET, BI> {
-            self.0.on_bind::<BI>();
-            LAST_BOUND.store(BI, core::sync::atomic::Ordering::Relaxed);
-            Bound(&mut self.0, bn)
-        }
-    }
-    
-}
-
-
-/**********************************************************/
-
 impl<ET> ibo_binder::OnBind for IBO<ET>{
     fn on_bind<const BI: usize>(&mut self) {
         self.bind_bo();
     }
 }
-
-pub type IBOBouncer = ibo_binder::BOUNCER<0>;
-pub type UnboundIBO<ET> = ibo_binder::Unbound<ET>;
-pub type BoundIBO<'a, ET> = ibo_binder::Bound<'a, ET, 0>;
-
-mod ibo_binder {
-    const NBOUNCERS: usize = 1;
-    type Usable<ET> = super::IBO<ET>;
-
-    pub trait OnBind {
-        fn on_bind<const BI: usize>(&mut self);
-    }
-
-    use bitvec::prelude::*;
-    use std::{
-        ops::{Deref, DerefMut},
-        sync::{atomic::AtomicUsize, Mutex},
-    };
-
-    lazy_static! {
-        static ref BOUNCER_GUARD: Mutex<BitArr!(for NBOUNCERS, in Msb0, u8)> = Mutex::new(BitArray::zeroed()); // BOUNCER_GUARD is private, this is important because we don't want somebody take()-ing the intialised OnceCell, leaving it uninitialised, and being able to call new() again on BOUNCER again and have two BOUNCERs
-        /// SAFTEY: LAST_BOUND is unreliable, don't rely on it for correctness
-        pub static ref LAST_BOUND: AtomicUsize = AtomicUsize::new(0);
-    }
-
-    pub struct BOUNCER<const BI: usize>(()); // NOTE: () is private, this is important so that the only way to get a BOUNCER instance is to use new()
-
-    impl<const BI: usize> BOUNCER<BI> {
-        /// IMPORTANT: Only one bouncer can exist ever
-        /// SAFETY: We are the only ones who can access BOUNCER_GUARD because it is private and we can use that to make sure that we only create one BOUNCER ever
-        #[inline]
-        pub fn new() -> Option<Self> {
-            if BI >= NBOUNCERS {
-                return None;
-            }
-            let mut lck = BOUNCER_GUARD.try_lock().ok()?;
-            if lck.get(BI).unwrap() == false {
-                lck.set(BI, true);
-                Some(BOUNCER(()))
-            } else {
-                None
-            }
-        }
-    }
-
-    // Because there only ever exists one bouncer a &mut to a BOUNCER must be unique, so thre can only ever exist one Bound
-    pub struct Bound<'a, ET, const BI: usize>(&'a mut Usable<ET>, &'a mut BOUNCER<BI>);
-
-    impl<ET, const BI: usize> Deref for Bound<'_, ET, BI> {
-        type Target = Usable<ET>;
-
-        #[inline]
-        fn deref(&self) -> &Self::Target {
-            &self.0
-        }
-    }
-
-    impl<ET, const BI: usize> DerefMut for Bound<'_, ET, BI> {
-        #[inline]
-        fn deref_mut(&mut self) -> &mut Self::Target {
-            &mut self.0
-        }
-    }
-
-    pub struct Unbound<ET>(Usable<ET>)
-    where
-        Usable<ET>: OnBind; // Usable is private, this is important because it means to get a Usable you must go through bind which goes through a Bound which requires a &mut BOUNCER, whichs is unique, so no matter how many Unbound there are, there will only ever be one Bound at a time
-
-    impl<ET> Unbound<ET> {
-        #[inline]
-        pub fn from(val: Usable<ET>) -> Unbound<ET> {
-            Unbound(val)
-        } // Takes a Usable and makes it an Unbound, this is fine since Usable can control how it's constructed and return an Unbound(Usable) instead of a Usable so there is no way a normal user can make a Usable without it being Unbound
-        #[inline]
-        pub fn bind<'a, /*TYPE_GENERICS_HERE*/ const BI: usize>(&'a mut self, bn: &'a mut BOUNCER<BI>) -> Bound<'a, ET, BI> {
-            self.0.on_bind::<BI>();
-            LAST_BOUND.store(BI, core::sync::atomic::Ordering::Relaxed);
-            Bound(&mut self.0, bn)
-        }
-    }
-}
-
-
-
-/**********************************************************/
 
 pub struct BOBase<ET> {
     id: GLuint,
@@ -205,7 +49,10 @@ impl<ET> Drop for BOBase<ET> {
 }
 
 /// Use an array for elem_per_vert to allow striding
+#[one_user]
 pub struct VBO<'a, ET>(BOBase<ET>, &'a [u8]);
+
+#[one_user]
 pub struct IBO<ET>(BOBase<ET>);
 
 impl<'a, ET: 'a> VBO<'a, ET> {
