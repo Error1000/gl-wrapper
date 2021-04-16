@@ -98,7 +98,7 @@ fn main() {
         program::Program::new(&[&vs.into(), &fs.into()]).unwrap()
     };
 
-    let mut program = program.bind(&mut prog_bouncer);
+    let mut program = program.bind_mut(&mut prog_bouncer);
     program.auto_load_all(30).unwrap();
     println!("Done!");
 
@@ -106,7 +106,7 @@ fn main() {
     // Load textures
     println!("Loading textures ...");
 
-    let mut t = {
+    let t = {
         let im = image::open(&Path::new("apple.png"))
             .expect("Reading textures!")
             .into_rgba8();
@@ -130,9 +130,9 @@ fn main() {
     // Load mesh data ( indices, vertices, uv data )
     println!("Loading mesh ...");
     let mut a = aggregator_obj::VAO::new();
-    let mut a = a.bind( &mut vao_bouncer);
+    let mut a = a.bind_mut( &mut vao_bouncer);
 
-    let mut pos_vbo = buffer_obj::VBO::<GLfloat>::with_data(
+    let pos_vbo = buffer_obj::VBO::<GLfloat>::with_data(
         &mut vbo_bouncer,
         &[2],
         &VERTEX_DATA,
@@ -149,7 +149,7 @@ fn main() {
     )
     .expect("Attaching pos vbo to vao!");
 
-    let mut tex_vbo =
+    let tex_vbo =
         buffer_obj::VBO::<GLfloat>::with_data(&mut vbo_bouncer, &[2], &TEX_DATA, gl::STATIC_DRAW)
             .expect("Uploading tex data to vbo!");
 
@@ -165,7 +165,7 @@ fn main() {
     a.adapt_vao_to_program(&program)
         .expect("Linking shader attributes to vao data!");
 
-    let mut ind_ibo = buffer_obj::IBO::<GLushort>::with_data(&mut ibo_bouncer, &IND_DATA, gl::STATIC_DRAW)
+    let ind_ibo = buffer_obj::IBO::<GLushort>::with_data(&mut ibo_bouncer, &IND_DATA, gl::STATIC_DRAW)
         .expect("Uploading indecies to ibo!");
     let ind_ibo = ind_ibo.bind( &mut ibo_bouncer);
     println!("Done!");

@@ -52,7 +52,7 @@ use one_user::one_user;
 
 impl<const N: usize, const TYP: GLenum> texturebase_binder::OnBind for TextureBase<N, TYP>{
     #[inline(always)]
-    fn on_bind<const SLOT: usize>(&mut self) {
+    fn on_bind<const SLOT: usize>(&self) {
         if SLOT != (*texturebase_binder::LAST_SLOT).load(core::sync::atomic::Ordering::Relaxed){
                 unsafe{
                     gl::ActiveTexture(gl::TEXTURE0 + SLOT as u32);
@@ -78,7 +78,7 @@ impl<const N: usize, const TYP: GLenum> TextureBase<N, TYP> {
         let mut r = UnboundTexture::from(r);
         {
             // Need to set scale filter otherwise the texture can't be used so we set a reasonable default here to avoid errors
-            let mut r = r.bind(bn);
+            let mut r = r.bind_mut(bn);
             r.set_mag_filter_of_bound_tex(gl::LINEAR);
             r.set_min_filter_of_bound_tex(gl::LINEAR);
         }
@@ -181,7 +181,7 @@ impl<const N: usize, const TYP: GLenum> TextureBase<N, TYP> {
     {
         let mut r = Self::new(bn);
         {
-            let mut r = r.bind(bn);
+            let mut r = r.bind_mut(bn);
             r.upload_data_to_texture(size, data, format)?;
         }
         Ok(r)

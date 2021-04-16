@@ -7,13 +7,13 @@ use one_user::one_user;
 
 impl<'b, ET> vbo_binder::OnBind for VBO<'b, ET> {
     #[inline(always)]
-    fn on_bind<const BI: usize>(&mut self) {
+    fn on_bind<const BI: usize>(&self) {
         self.bind_bo();
     }
 }
 
 impl<ET> ibo_binder::OnBind for IBO<ET>{
-    fn on_bind<const BI: usize>(&mut self) {
+    fn on_bind<const BI: usize>(&self) {
         self.bind_bo();
     }
 }
@@ -68,7 +68,7 @@ impl<'a, ET: 'a> VBO<'a, ET> {
     ) -> Result<vbo_binder::Unbound<'a, ET>, String> {
         let mut r = Self::new(elem_per_vert);
         {
-            let mut r = r.bind(bn);
+            let mut r = r.bind_mut(bn);
             r.upload_to_bound_bo(data, usage)?;
         }
         Ok(r)
@@ -116,7 +116,7 @@ impl<ET> IBO<ET> {
     pub fn with_data(bn: &mut IBOBouncer, data: &[ET], usage: GLenum) -> Result<UnboundIBO<ET>, String> {
         let mut r = Self::new();
         {
-            let mut r = r.bind(bn);
+            let mut r = r.bind_mut(bn);
             r.upload_to_bo(data, usage)?;
         }
         Ok(r)

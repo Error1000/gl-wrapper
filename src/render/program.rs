@@ -10,7 +10,7 @@ use one_user::one_user;
 
 impl program_binder::OnBind for Program {
     #[inline(always)]
-    fn on_bind<const BI: usize>(&mut self) {
+    fn on_bind<const BI: usize>(&self) {
         self.bind_program();
     }
 }

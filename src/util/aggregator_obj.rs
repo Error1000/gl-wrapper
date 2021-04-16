@@ -9,7 +9,7 @@ use std::ptr;
 use one_user::one_user;
 
 impl vao_binder::OnBind for VAO{
-    fn on_bind<const BI: usize>(&mut self) {
+    fn on_bind<const BI: usize>(&self) {
         self.bind_ao();
     }
 }
