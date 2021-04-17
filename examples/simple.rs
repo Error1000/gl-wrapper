@@ -2,10 +2,12 @@ extern crate gl_wrapper;
 extern crate glutin;
 extern crate image;
 
-use gl_wrapper::render::{program, shader, texture};
-use gl_wrapper::util::buffer_obj::BOFunc;
+use gl_wrapper::render::*;
 use gl_wrapper::util::*;
+
+use gl_wrapper::util::buffer_obj::BOFunc;
 use gl_wrapper::HasGLEnum;
+
 use glutin::dpi::PhysicalSize;
 use std::convert::TryInto;
 
