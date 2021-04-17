@@ -53,13 +53,12 @@ use one_user::one_user;
 impl<const N: usize, const TYP: GLenum> texturebase_binder::OnBind for TextureBase<N, TYP>{
     #[inline(always)]
     fn on_bind<const SLOT: usize>(&self) {
-        //if SLOT != (*texturebase_binder::LAST_SLOT).load(core::sync::atomic::Ordering::Relaxed){
+        if SLOT != (*texturebase_binder::LAST_SLOT).load(core::sync::atomic::Ordering::SeqCst){
                 unsafe{
                     gl::ActiveTexture(gl::TEXTURE0 + SLOT as u32);
                 }
-        //}
+        }
         unsafe{ gl::BindTexture(TYP, self.id); }
-    
 
     }
 }

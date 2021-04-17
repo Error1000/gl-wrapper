@@ -2,13 +2,13 @@ use crate::render::shader::*;
 use crate::unwrap_result_or_ret;
 use gl::types::*;
 use std::collections::HashMap;
-use std::convert::{TryFrom, TryInto};
+use std::convert::TryInto;
 use std::ffi::CString;
 use std::ptr;
 use std::str;
 use one_user::one_user;
 
-impl program_binder::OnBind for Program {
+impl program_binder::OnBind for Program<'_> {
     #[inline(always)]
     fn on_bind<const BI: usize>(&self) {
         self.bind_program();
@@ -16,15 +16,15 @@ impl program_binder::OnBind for Program {
 }
 
 #[one_user]
-pub struct Program {
+pub struct Program<'a> {
     id: GLuint,
     /// TODO: Maybe optimise this as realistically there aren't going to be more than 100 entries
     /// in either of these hash maps so the 1 in O(1) becomes pretty big in comparison to a simple array (because of the small size)
-    uniform_ids: HashMap<String, GLuint>,
-    attrib_ids: HashMap<String, GLuint>,
+    uniform_ids: HashMap<&'a str, GLuint>,
+    attrib_ids: HashMap<&'a str, GLuint>,
 }
 
-impl Drop for Program {
+impl Drop for Program<'_> {
     fn drop(self: &mut Self) {
         unsafe {
             gl::DeleteProgram(self.id);
@@ -32,8 +32,8 @@ impl Drop for Program {
     }
 }
 
-impl Program {
-    pub fn new(shaders: &[&ShaderBase]) -> Result<program_binder::Unbound, String> {
+impl<'a> Program<'a> {
+    pub fn new(shaders: &[&ShaderBase]) -> Result<UnboundProgram<'a>, String> {
         let r = Program {
             id: unsafe { gl::CreateProgram() },
             uniform_ids: HashMap::new(),
@@ -108,7 +108,7 @@ impl Program {
         Ok(id)
     }
 
-    pub fn load_uniform(self: &mut Self, name: String) -> Result<(), String> {
+    pub fn load_uniform(self: &mut Self, name: &'a str) -> Result<(), String> {
         // Check if already loaded, glGetUniformLocation can be pretty damn slow and a simple contains_key, especially on a hashbrown is probablly way faster
         if !self.uniform_ids.contains_key(&name) {
             let u_id = self.get_id_of(&name, gl::GetUniformLocation)?;
@@ -117,96 +117,16 @@ impl Program {
         Ok(())
     }
 
-    pub fn load_sampler(self: &mut Self, name: String) -> Result<(), String> {
+    pub fn load_sampler(self: &mut Self, name: &'a str) -> Result<(), String> {
         self.load_uniform(name)
     }
 
-    pub fn load_attribute(self: &mut Self, name: String) -> Result<(), String> {
+    pub fn load_attribute(self: &mut Self, name: &'a str) -> Result<(), String> {
         // Check if already loaded, glGetUniformLocation can be pretty damn slow and a simple contains_key, especially on a hashbrown is probably way faster
         if !self.attrib_ids.contains_key(&name) {
             let a_id = self.get_id_of(&name, gl::GetAttribLocation)?;
             self.attrib_ids.insert(name, a_id);
         }
-        Ok(())
-    }
-
-    /// Warning: Does NOT support arrays of uniforms/attributes/samplers!
-    pub fn auto_load_all(self: &mut Self, buf_size: GLushort) -> Result<(), String> {
-        let mut count: GLint = 0;
-        let mut name = vec![0_u8; buf_size.into()];
-
-        unsafe { gl::GetProgramiv(self.id, gl::ACTIVE_ATTRIBUTES, &mut count) };
-        let count = unwrap_result_or_ret!(
-            GLuint::try_from(count),
-            Err(format!("Invalid number of attributes: {}", count))
-        );
-        for i in 0..count {
-            let nam: &[u8] = {
-                let mut typ: GLenum = 0;
-                let mut siz: GLint = 0;
-                let mut actual_len: GLsizei = 0;
-                unsafe {
-                    gl::GetActiveAttrib(
-                        self.id,
-                        unwrap_result_or_ret!(
-                            i.try_into(),
-                            Err(format!("Invalid attribute id: {}", i))
-                        ),
-                        buf_size.into(),
-                        &mut actual_len,
-                        &mut siz,
-                        &mut typ,
-                        name.as_mut_ptr() as *mut GLchar,
-                    )
-                };
-                &name[0..unwrap_result_or_ret!(actual_len.try_into(), Err("Opengl returned negative name size for attribute, faulty opengl implementation!".to_owned()))]
-            };
-            self.attrib_ids.insert(
-                String::from(unwrap_result_or_ret!(
-                    str::from_utf8(nam),
-                    Err(format!("Invalid attribute name: {:?}", nam))
-                )),
-                i,
-            );
-        }
-
-        let mut count: GLint = 0;
-
-        unsafe { gl::GetProgramiv(self.id, gl::ACTIVE_UNIFORMS, &mut count) };
-        let count = unwrap_result_or_ret!(
-            GLuint::try_from(count),
-            Err(format!("Invalid number of uniforms: {}", count))
-        );
-        for i in 0..count {
-            let nam: &[u8] = {
-                let mut typ: GLenum = 0;
-                let mut siz: GLint = 0;
-                let mut actual_len: GLsizei = 0;
-                unsafe {
-                    gl::GetActiveUniform(
-                        self.id,
-                        unwrap_result_or_ret!(
-                            i.try_into(),
-                            Err(format!("Invalid uniform id: {}", i))
-                        ),
-                        buf_size.into(),
-                        &mut actual_len,
-                        &mut siz,
-                        &mut typ,
-                        name.as_mut_ptr() as *mut GLchar,
-                    )
-                };
-                &name[0..unwrap_result_or_ret!(actual_len.try_into(), Err("Opengl returned negative name size for uniform, faulty opengl implementation!".to_owned()))]
-            };
-            self.uniform_ids.insert(
-                String::from(unwrap_result_or_ret!(
-                    str::from_utf8(nam),
-                    Err(format!("Invalid attribute name: {:?}", nam))
-                )),
-                i,
-            );
-        }
-
         Ok(())
     }
 
@@ -294,12 +214,12 @@ impl Program {
     }
 
     #[inline]
-    pub fn get_attribute_hashmap(self: &Self) -> &HashMap<String, GLuint> {
+    pub fn get_attribute_hashmap(self: &Self) -> &HashMap<&str, GLuint> {
         &self.attrib_ids
     }
 
     #[inline]
-    pub fn get_uniform_hashmap(self: &Self) -> &HashMap<String, GLuint> {
+    pub fn get_uniform_hashmap(self: &Self) -> &HashMap<&str, GLuint> {
         &self.uniform_ids
     }
 

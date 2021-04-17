@@ -59,7 +59,6 @@ fn main() {
     let mut prog_bouncer = program::ProgramBouncer::new();
 
     let mut vao_bouncer = aggregator_obj::VAOBouncer::new();
-    let mut texunit0_bouncer = texture::TextureBouncer::<0>::new();
 
 
     let events_loop = EventLoop::new();
@@ -99,7 +98,14 @@ fn main() {
     };
 
     let mut program = program.bind_mut(&mut prog_bouncer);
-    program.auto_load_all(30).unwrap();
+    program.load_attribute("position").expect("Loading attribute 'position'");
+    program.load_attribute("tex_coord").expect("Loading attribute 'tex_coord'");
+    program.load_uniform("obj_tex").expect("Loading uniform sampler 'obj_tex'");
+
+    const TUNIT: usize = 0;
+    { let id = program.get_uniform_id("obj_tex").unwrap().try_into().unwrap(); program.set_uniform_i32(id, TUNIT.try_into().unwrap()); }
+    let mut texunit_bouncer = texture::TextureBouncer::<TUNIT>::new();
+
     println!("Done!");
 
     // NOTE: "with_data" constructors grantee that the object crated WILL be bound "new" constructors do not
@@ -111,7 +117,7 @@ fn main() {
             .expect("Reading textures!")
             .into_rgba8();
         texture::Texture2D::with_data(
-            &mut texunit0_bouncer,
+            &mut texunit_bouncer,
             [
                 im.width().try_into().unwrap(),
                 im.height().try_into().unwrap(),
@@ -123,7 +129,7 @@ fn main() {
     };
     let texid: usize = program.get_sampler_id("obj_tex").unwrap() as usize;
     assert_eq!(texid, 0);
-    let _t = t.bind::<0>(&mut texunit0_bouncer);
+    let _t = t.bind(&mut texunit_bouncer);
 
     println!("Done!");
 
