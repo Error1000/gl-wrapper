@@ -54,9 +54,9 @@ impl<const N: usize, const TYP: GLenum> texturebase_binder::OnBind for TextureBa
     #[inline(always)]
     fn on_bind<const SLOT: usize>(&self) {
         //if SLOT != (*texturebase_binder::LAST_SLOT).load(core::sync::atomic::Ordering::Relaxed){
-                unsafe{
-                    gl::ActiveTexture(gl::TEXTURE0);
-                }
+               // unsafe{
+                 //   gl::ActiveTexture(gl::TEXTURE0);
+               // }
         //}
         unsafe{ gl::BindTexture(TYP, self.id); }
         unsafe{
