@@ -53,11 +53,11 @@ use one_user::one_user;
 impl<const N: usize, const TYP: GLenum> texturebase_binder::OnBind for TextureBase<N, TYP>{
     #[inline(always)]
     fn on_bind<const SLOT: usize>(&self) {
-        if SLOT != (*texturebase_binder::LAST_SLOT).load(core::sync::atomic::Ordering::Relaxed){
+        //if SLOT != (*texturebase_binder::LAST_SLOT).load(core::sync::atomic::Ordering::Relaxed){
                 unsafe{
                     gl::ActiveTexture(gl::TEXTURE0 + SLOT as u32);
                 }
-        }
+        //}
         unsafe{ gl::BindTexture(TYP, self.id); }
     }
 }
@@ -77,7 +77,8 @@ impl<const N: usize, const TYP: GLenum> TextureBase<N, TYP> {
         }
         let mut r = UnboundTexture::from(r);
         {
-            // Need to set scale filter otherwise the texture can't be used so we set a reasonable default here to avoid errors
+            // Need to set min and mag filter because opengl by default uses mipmaps and we currently do not support that
+            // Not setting the min and mag filters would probablly mean textures would appear as blank
             let mut r = r.bind_mut(bn);
             r.set_mag_filter_of_bound_tex(gl::LINEAR);
             r.set_min_filter_of_bound_tex(gl::LINEAR);
