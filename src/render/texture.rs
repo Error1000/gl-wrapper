@@ -59,9 +59,7 @@ impl<const N: usize, const TYP: GLenum> texturebase_binder::OnBind for TextureBa
                 }
         //}
         unsafe{ gl::BindTexture(TYP, self.id); }
-        unsafe{
-            gl::ActiveTexture(gl::TEXTURE0 + SLOT as u32);
-        }
+    
 
     }
 }
