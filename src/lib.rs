@@ -160,7 +160,7 @@ pub fn init(win: WindowedContext<NotCurrent>) -> Option<WindowedContext<Possibly
 }
 
 pub fn format_to_gl_internal_format(bpc: u8, format: GLenum) -> Option<(GLint, u8)> {
-    let cpp: u8 = match format {
+    let cpp: u8 = match format { // Channels Per Pixel
         gl::RED => 1,
         gl::RG => 2,
         gl::RGB => 3,
@@ -168,7 +168,7 @@ pub fn format_to_gl_internal_format(bpc: u8, format: GLenum) -> Option<(GLint, u
         _ => return None,
     };
 
-    let internal_format = match bpc {
+    let internal_format = match bpc { // Bits Per Channel
         8 => match format {
             gl::RED => gl::R8,
             gl::RG => gl::RG8,

@@ -10,7 +10,7 @@ use gl_wrapper::HasGLEnum;
 use glutin::dpi::PhysicalSize;
 use std::convert::TryInto;
 
-use gl::types::*;
+use gl::{types::*, VERSION, TEXTURE28};
 use std::ptr;
 use std::str;
 
@@ -51,7 +51,7 @@ out vec4 out_color;
 uniform sampler2D obj_tex;
 in vec2 pass_tex_coord;
 void main() {
-    out_color = vec4(1.0, 0.0, 0.0, 1.0) + 0.00001*texture2D(obj_tex, pass_tex_coord);
+    out_color = texture2D(obj_tex, pass_tex_coord);
 }";
 
 fn main() {
@@ -138,32 +138,49 @@ fn main() {
     let mut a = aggregator_obj::VAO::new();
     let mut a = a.bind_mut( &mut vao_bouncer);
 
-    let pos_vbo = buffer_obj::VBO::<GLfloat>::with_data(
+    let mut INTERLACED_DATA: Vec<f32> = Vec::new();
+{
+    let mut a = POS_DATA.iter();
+    let mut b = TEX_DATA.iter();
+    loop{
+        let mut a_ended = false;
+        let mut b_ended = false;
+        for _ in 1..=2{ 
+        if let Some(v) = a.next(){
+            INTERLACED_DATA.push(*v);
+        }else{a_ended = true;}
+        }
+
+        for _ in 1..=2{
+        if let Some(v) = b.next(){
+            INTERLACED_DATA.push(*v);
+        }else{b_ended = true;}
+        }
+
+        if a_ended && b_ended{break;}
+    }
+}
+    let postex_vbo = buffer_obj::VBO::<GLfloat>::with_data(
         &mut vbo_bouncer,
-        &[2],
-        &POS_DATA,
+        &[2, 2],
+            &INTERLACED_DATA, 
         gl::STATIC_DRAW,
     )
     .expect("Uploading pos data to vbo!");
 
-    let pos_vbo = pos_vbo.bind(&mut vbo_bouncer);
+    let postex_vbo = postex_vbo.bind(&mut vbo_bouncer);
     a.attach_vbo_to_vao(
-        &pos_vbo,
+        &postex_vbo,
         program.get_attribute_id("position").unwrap(),
         0,
         false,
     )
     .expect("Attaching pos vbo to vao!");
 
-    let tex_vbo =
-        buffer_obj::VBO::<GLfloat>::with_data(&mut vbo_bouncer, &[2], &TEX_DATA, gl::STATIC_DRAW)
-            .expect("Uploading tex data to vbo!");
-
-    let tex_vbo = tex_vbo.bind(&mut vbo_bouncer);
     a.attach_vbo_to_vao(
-        &tex_vbo,
+        &postex_vbo,
         program.get_attribute_id("tex_coord").unwrap(),
-        0,
+        1,
         false,
     )
     .expect("Attaching tex vbo to vao!");

@@ -5,7 +5,7 @@ use std::ptr;
 use std::str;
 
 pub struct ShaderBase {
-    id: GLuint,
+    id: GLuint
 }
 
 impl Drop for ShaderBase {

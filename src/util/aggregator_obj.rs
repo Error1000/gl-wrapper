@@ -62,7 +62,7 @@ impl VAO {
 
     /// Note: the auto_convert_to_f32 is here because some pretty old
     /// gpus can only work with f32,
-    /// however this dosen't actually convert the VBO
+    /// however this dosen't actually convert the VBO on cpu
     /// it just sets a flag that tells the gpu to convert to f32
     pub fn attach_vbo_to_vao<ET>(
         self: &mut Self,
@@ -74,18 +74,12 @@ impl VAO {
     where
         ET: HasGLEnum,
     {
-        // These are all i32 because that's what the opengl function takes (GLint)
-        let mut sum: GLint = 0;
-        for e in bo.get_elem_per_vertex() {
-            sum += GLint::from(*e);
-        }
-        sum -= GLint::from(bo.get_elem_per_vertex()[stride_ind]);
-        let skip: GLint = sum
-            * unwrap_result_or_ret!(
-                GLint::try_from(size_of::<ET>()),
-                Err("Type size too big for opengl!".to_owned())
-            );
-        if skip < 0 {
+        let size_of_datatype_in_bytes = unwrap_result_or_ret!(
+            GLint::try_from(size_of::<ET>()),
+            Err("Type size too big for opengl!".to_owned())
+        );
+        let jump_ahead: GLint = i32::from(bo.get_elem_per_vertex()[..stride_ind].iter().sum::<u8>()) * size_of_datatype_in_bytes;
+        if jump_ahead < 0 {
             return Err("Size of elements computed was negative( this should have been impossible, maybe an integer overflow happened?)".to_owned());
         }
 
@@ -97,6 +91,7 @@ impl VAO {
             || gl_typ == GLint::get_gl_type()
             || gl_typ == GLuint::get_gl_type();
 
+        // Note we don't use the normalize feature of opengl at all
         if gl_typ == GLfloat::get_gl_type() || (auto_convert_to_f32 && is_int) {
             /*
                 Docs say:
@@ -109,8 +104,8 @@ impl VAO {
                         bo.get_elem_per_vertex()[stride_ind].into(),
                         gl_typ,
                         gl::FALSE,
-                        skip, // how many elements to skip each iteration
-                        (ptr::null() as *const std::ffi::c_void).offset(unwrap_result_or_ret!(isize::try_from(skip), Err("Architecture size too small, stride offset too big, you put too many elements per vertex, so many that the cpu's architecutre can't properly hold the offset pointer so it can know where the elements for each attribute begin, i'm both impressed and horrified at the same time :)".to_owned()))), // offset by stride once ( not every iteration ) to make sure skipping works and that we are reading the right elements
+                        i32::from(bo.get_elem_per_vertex().iter().sum::<u8>()) * size_of_datatype_in_bytes, // how many elements to skip each iteration
+                        (0 as *const u8).offset(unwrap_result_or_ret!(isize::try_from(jump_ahead), Err("Opengl can't properly hold the offset pointer so it can know where the elements for each attribute begin, i'm both impressed and horrified at the same time :)".to_owned()))) as *const std::ffi::c_void, // offset by stride once ( not every iteration ) to make sure skipping works and that we are reading the right elements
                     );
             }
         } else if is_int {
@@ -123,8 +118,8 @@ impl VAO {
                     index,
                     bo.get_elem_per_vertex()[stride_ind].into(),
                     gl_typ,
-                    skip, // how many elements to skip each iteration
-                    (ptr::null() as *const std::ffi::c_void).offset(unwrap_result_or_ret!(isize::try_from(skip), Err("Architecture size too small, stride offset too big, you put too many elements per vertex, so many that the cpu's architecutre can't properly hold the offset pointer so it can know where the elements for each attribute begin, i'm both impressed and horrified at the same time :)".to_owned()))), // offset by stride once ( not every iteration ) to make sure skipping works and that we are reading the right elements
+                    i32::from(bo.get_elem_per_vertex().iter().sum::<u8>()) * size_of_datatype_in_bytes, // how many elements to skip each iteration
+                    (0 as *const u8).offset(unwrap_result_or_ret!(isize::try_from(jump_ahead), Err("Opengl can't properly hold the offset pointer so it can know where the elements for each attribute begin, i'm both impressed and horrified at the same time :)".to_owned()))) as *const std::ffi::c_void, // offset by stride once ( not every iteration ) to make sure skipping works and that we are reading the right elements
                 );
             }
         } else if gl_typ == GLdouble::get_gl_type() {
@@ -137,8 +132,8 @@ impl VAO {
                     index,
                     bo.get_elem_per_vertex()[stride_ind].into(),
                     gl_typ,
-                    skip, // how many elements to skip each iteration
-                    (ptr::null() as *const std::ffi::c_void).offset(unwrap_result_or_ret!(isize::try_from(skip), Err("Architecture size too small, stride offset too big, you put too many elements per vertex, so many that the cpu's architecutre can't properly hold the offset pointer so it can know where the elements for each attribute begin, i'm both impressed and horrified at the same time :)".to_owned()))), // offset by stride once ( not every iteration ) to make sure skipping works and that we are reading the right elements
+                    i32::from(bo.get_elem_per_vertex().iter().sum::<u8>()) * size_of_datatype_in_bytes, // how many elements to skip each iteration
+                    (0 as *const u8).offset(unwrap_result_or_ret!(isize::try_from(jump_ahead), Err("Opengl can't properly hold the offset pointer so it can know where the elements for each attribute begin, i'm both impressed and horrified at the same time :)".to_owned()))) as *const std::ffi::c_void, // offset by stride once ( not every iteration ) to make sure skipping works and that we are reading the right elements
                 );
             }
         } else {

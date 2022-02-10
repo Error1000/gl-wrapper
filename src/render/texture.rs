@@ -10,7 +10,7 @@ unsafe fn internal_gl_tex_image<const N: usize>(
     target: GLenum,
     level: GLint,
     internal_format: GLint,
-    dim: &[GLsizei; N],
+    dim: [GLsizei; N],
     border: GLint,
     format: GLenum,
     typ: GLenum,
@@ -44,16 +44,16 @@ unsafe fn internal_gl_tex_image<const N: usize>(
     }
 }
 
-mod texture_base{
+mod texture{
 use super::*;
 use gl::types::{GLenum, GLuint};
 use one_user::one_user;
 
 
-impl<const N: usize, const TYP: GLenum> texturebase_binder::OnBind for TextureBase<N, TYP>{
+impl<const N: usize, const TYP: GLenum> texture_binder::OnBind for Texture<N, TYP>{
     #[inline(always)]
     fn on_bind<const SLOT: usize>(&self) {
-        if SLOT != (*texturebase_binder::LAST_SLOT).load(core::sync::atomic::Ordering::SeqCst){
+        if SLOT != (*texture_binder::LAST_SLOT).load(core::sync::atomic::Ordering::SeqCst){
                 unsafe{
                     gl::ActiveTexture(gl::TEXTURE0 + SLOT as u32);
                 }
@@ -65,14 +65,14 @@ impl<const N: usize, const TYP: GLenum> texturebase_binder::OnBind for TextureBa
 
 
 #[one_user(256)]
-pub struct TextureBase<const N: usize, const TYP: GLenum> {
+pub struct Texture<const N: usize, const TYP: GLenum> {
     id: GLuint,
 }
 
 
-impl<const N: usize, const TYP: GLenum> TextureBase<N, TYP> {
-    pub fn new<const BI: usize>(bn: &mut texturebase_binder::BOUNCER<BI>) -> UnboundTexture<N, TYP> {
-        let mut r = TextureBase { id: 0 };
+impl<const N: usize, const TYP: GLenum> Texture<N, TYP> {
+    pub fn new<const BI: usize>(bn: &mut texture_binder::BOUNCER<BI>) -> UnboundTexture<N, TYP> {
+        let mut r = Texture { id: 0 };
         unsafe {
             gl::GenTextures(1, &mut r.id);
         }
@@ -162,7 +162,7 @@ impl<const N: usize, const TYP: GLenum> TextureBase<N, TYP> {
                 TYP,
                 0,
                 internal_fmt,
-                &formatted_siz,
+                formatted_siz,
                 0,
                 format,
                 ET::get_gl_type(),
@@ -190,7 +190,7 @@ impl<const N: usize, const TYP: GLenum> TextureBase<N, TYP> {
     }
 }
 
-impl<const N: usize, const TYP: GLenum> Drop for TextureBase<N, TYP> {
+impl<const N: usize, const TYP: GLenum> Drop for Texture<N, TYP> {
     fn drop(self: &mut Self) {
         unsafe {
             gl::DeleteTextures(1, &self.id);
@@ -201,10 +201,8 @@ impl<const N: usize, const TYP: GLenum> Drop for TextureBase<N, TYP> {
 
 }
 
-pub type Texture2D = texture_base::TextureBase<2, { gl::TEXTURE_2D }>;
-pub type Texture2DArr = texture_base::TextureBase<3, { gl::TEXTURE_2D_ARRAY }>;
-pub type Texture3D = texture_base::TextureBase<3, { gl::TEXTURE_3D }>;
+pub type Texture2D = texture::Texture<2, { gl::TEXTURE_2D }>;
+pub type Texture2DArr = texture::Texture<3, { gl::TEXTURE_2D_ARRAY }>;
+pub type Texture3D = texture::Texture<3, { gl::TEXTURE_3D }>;
 
-pub type TextureBouncer<const BI: usize> = texture_base::TextureBaseBouncer<BI>;
-pub type UnboundTexture<const N: usize, const TYP: GLenum> = texture_base::UnboundTextureBase<N, TYP>;
-pub type BoundTexture<'a, const BI: usize, const N: usize, const TYP: GLenum> = texture_base::BoundTextureBase<'a, N, TYP, BI>;
+pub type TextureBouncer<const SLOT: usize> = texture::TextureBouncer<SLOT>;
