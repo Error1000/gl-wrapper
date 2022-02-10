@@ -25,7 +25,7 @@ pub struct Program<'a> {
 }
 
 impl Drop for Program<'_> {
-    fn drop(self: &mut Self) {
+    fn drop(&mut self) {
         unsafe {
             gl::DeleteProgram(self.id);
         }
@@ -83,7 +83,7 @@ impl<'a> Program<'a> {
         Ok(program_binder::Unbound::from(r))
     }
 
-    fn bind_program(self: &Self) {
+    fn bind_program(&self) {
         unsafe {
             gl::UseProgram(self.id);
         }
@@ -93,7 +93,7 @@ impl<'a> Program<'a> {
     /// TODO: Should probably get rid of inline(always) but i know this function is only used in like 2 spots and there is no real reason not to inline it
     #[inline(always)]
     fn get_id_of(
-        self: &Self,
+        &self,
         name: &str,
         get_location: unsafe fn(GLuint, *const GLchar) -> GLint,
     ) -> Result<u32, &str> {
@@ -108,133 +108,133 @@ impl<'a> Program<'a> {
         Ok(id)
     }
 
-    pub fn load_uniform(self: &mut Self, name: &'a str) -> Result<(), String> {
-        // Check if already loaded, glGetUniformLocation can be pretty damn slow and a simple contains_key, especially on a hashbrown is probablly way faster
+    pub fn load_uniform(&mut self, name: &'a str) -> Result<(), String> {
+        // Check if already loaded, glGetUniformLocation can be pretty damn slow [citation needed] and a simple contains_key, especially on a hashbrown is probablly way faster
         if !self.uniform_ids.contains_key(&name) {
-            let u_id = self.get_id_of(&name, gl::GetUniformLocation)?;
+            let u_id = self.get_id_of(name, gl::GetUniformLocation)?;
             self.uniform_ids.insert(name, u_id);
         }
         Ok(())
     }
 
-    pub fn load_sampler(self: &mut Self, name: &'a str) -> Result<(), String> {
+    pub fn load_sampler(&mut self, name: &'a str) -> Result<(), String> {
         self.load_uniform(name)
     }
 
-    pub fn load_attribute(self: &mut Self, name: &'a str) -> Result<(), String> {
+    pub fn load_attribute(&mut self, name: &'a str) -> Result<(), String> {
         // Check if already loaded, glGetUniformLocation can be pretty damn slow and a simple contains_key, especially on a hashbrown is probably way faster
         if !self.attrib_ids.contains_key(&name) {
-            let a_id = self.get_id_of(&name, gl::GetAttribLocation)?;
+            let a_id = self.get_id_of(name, gl::GetAttribLocation)?;
             self.attrib_ids.insert(name, a_id);
         }
         Ok(())
     }
 
     #[inline]
-    pub fn clear_all_loaded(self: &mut Self) {
+    pub fn clear_all_loaded(&mut self) {
         self.uniform_ids.clear();
         self.attrib_ids.clear();
     }
 
     #[inline]
-    pub fn set_uniform_i32(self: &mut Self, id: GLint, val: i32) {
+    pub fn set_uniform_i32(&mut self, id: GLint, val: i32) {
         unsafe {
             gl::Uniform1i(id, val);
         }
     }
 
     #[inline]
-    pub fn set_uniform_u32(self: &mut Self, id: GLint, val: u32) {
+    pub fn set_uniform_u32(&mut self, id: GLint, val: u32) {
         unsafe {
             gl::Uniform1ui(id, val);
         }
     }
 
     #[inline]
-    pub fn set_uniform_f32(self: &mut Self, id: GLint, val: f32) {
+    pub fn set_uniform_f32(&mut self, id: GLint, val: f32) {
         unsafe {
             gl::Uniform1f(id, val);
         }
     }
 
     #[inline]
-    pub fn set_uniform_vec3_f32(self: &mut Self, id: GLint, val: [f32; 3]) {
+    pub fn set_uniform_vec3_f32(&mut self, id: GLint, val: [f32; 3]) {
         unsafe {
             gl::Uniform3fv(id, 1, val.as_ptr());
         }
     }
 
     #[inline]
-    pub fn set_uniform_vec3_i32(self: &mut Self, id: GLint, val: [i32; 3]) {
+    pub fn set_uniform_vec3_i32(&mut self, id: GLint, val: [i32; 3]) {
         unsafe {
             gl::Uniform3iv(id, 1, val.as_ptr());
         }
     }
 
     #[inline]
-    pub fn set_uniform_vec3_u32(self: &mut Self, id: GLint, val: [u32; 3]) {
+    pub fn set_uniform_vec3_u32(&mut self, id: GLint, val: [u32; 3]) {
         unsafe {
             gl::Uniform3uiv(id, 1, val.as_ptr());
         }
     }
 
     #[inline]
-    pub fn set_uniform_vec2_f32(self: &mut Self, id: GLint, val: [f32; 2]) {
+    pub fn set_uniform_vec2_f32(&mut self, id: GLint, val: [f32; 2]) {
         unsafe {
             gl::Uniform2fv(id, 1, val.as_ptr());
         }
     }
 
     #[inline]
-    pub fn set_uniform_vec2_i32(self: &mut Self, id: GLint, val: [i32; 2]) {
+    pub fn set_uniform_vec2_i32(&mut self, id: GLint, val: [i32; 2]) {
         unsafe {
             gl::Uniform2iv(id, 1, val.as_ptr());
         }
     }
 
     #[inline]
-    pub fn set_uniform_vec2_u32(self: &mut Self, id: GLint, val: [u32; 2]) {
+    pub fn set_uniform_vec2_u32(&mut self, id: GLint, val: [u32; 2]) {
         unsafe {
             gl::Uniform2uiv(id, 1, val.as_ptr());
         }
     }
 
     #[inline]
-    pub fn set_uniform_mat3_f32(self: &mut Self, id: GLint, val: &[f32; 3 * 3]) {
+    pub fn set_uniform_mat3_f32(&mut self, id: GLint, val: &[f32; 3 * 3]) {
         unsafe {
             gl::UniformMatrix3fv(id, 1, gl::FALSE, val.as_ptr());
         }
     }
 
     #[inline]
-    pub fn set_uniform_mat4_f32(self: &mut Self, id: GLint, val: &[f32; 4 * 4]) {
+    pub fn set_uniform_mat4_f32(&mut self, id: GLint, val: &[f32; 4 * 4]) {
         unsafe {
             gl::UniformMatrix4fv(id, 1, gl::FALSE, val.as_ptr());
         }
     }
 
     #[inline]
-    pub fn get_attribute_hashmap(self: &Self) -> &HashMap<&str, GLuint> {
+    pub fn get_attribute_hashmap(&self) -> &HashMap<&str, GLuint> {
         &self.attrib_ids
     }
 
     #[inline]
-    pub fn get_uniform_hashmap(self: &Self) -> &HashMap<&str, GLuint> {
+    pub fn get_uniform_hashmap(&self) -> &HashMap<&str, GLuint> {
         &self.uniform_ids
     }
 
     #[inline]
-    pub fn get_uniform_id(self: &Self, name: &str) -> Option<GLuint> {
+    pub fn get_uniform_id(&self, name: &str) -> Option<GLuint> {
         self.uniform_ids.get(name).cloned()
     }
 
     #[inline]
-    pub fn get_attribute_id(self: &Self, name: &str) -> Option<GLuint> {
+    pub fn get_attribute_id(&self, name: &str) -> Option<GLuint> {
         self.attrib_ids.get(name).cloned()
     }
 
     #[inline]
-    pub fn get_sampler_id(self: &Self, name: &str) -> Option<GLuint> {
+    pub fn get_sampler_id(&self, name: &str) -> Option<GLuint> {
         self.get_uniform_id(name)
     }
 }

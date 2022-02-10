@@ -43,15 +43,15 @@ pub fn get_gl_version_str() -> String {
 // NOTE: We use inline(always) here to make sure the optimiser gets the best chance to remove the bounds checks
 #[inline(always)]
 pub fn set_gl_clear_color(r: f32, g: f32, b: f32, a: f32) -> Result<(), &'static str> {
-    if r > 1.0 || r < 0.0 {
+    if !(0.0..=1.0).contains(&r) {
         return Err(
             "R value of clear color too big or too small ( has to be between 0.0 and 1.0 )!",
         );
-    } else if g > 1.0 || g < 0.0 {
+    } else if !(0.0..=1.0).contains(&g) {
         return Err(
             "G value of clear color too big or too small ( has to be between 0.0 and 1.0 )!",
         );
-    } else if b > 1.0 || b < 0.0 {
+    } else if !(0.0..=1.0).contains(&b) {
         return Err(
             "B value of clear color too big or too small ( has to be between 0.0 and 1.0 )!",
         );
@@ -74,10 +74,12 @@ pub fn set_gl_draw_size(w: u32, h: u32) -> Result<(), &'static str> {
     }
     Ok(())
 }
+
+
+/// # Safety
+///
+/// Since this is a pub trait if somebody decides to implement HasGLEnum for their own type and get the enum wrong this would allow for a buffer overflow/underflow in all unsafe functions relying on this
 pub unsafe trait HasGLEnum {
-    /// # Safety
-    ///
-    /// Since this is a pub trait if somebody decides to implement HasGLEnum for their own type and get the enum wrong this would allow for a buffer overflow/underflow in all unsafe functions relying on this
     fn get_gl_type() -> GLenum;
 }
 

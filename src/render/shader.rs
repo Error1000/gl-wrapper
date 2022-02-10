@@ -9,7 +9,7 @@ pub struct ShaderBase {
 }
 
 impl Drop for ShaderBase {
-    fn drop(self: &mut Self) {
+    fn drop(&mut self) {
         unsafe {
             gl::DeleteShader(self.id);
         }
@@ -45,7 +45,7 @@ impl ShaderBase {
 				Err(_) => return Err(String::from("Length of error message of shader compilation is either too big or negative!")),
 			    };
                 let mut buf = Vec::<u8>::with_capacity(new_len);
-                buf.set_len(new_len - 1); // subtract 1 to skip the trailing null character
+                buf.resize(new_len - 1, u8::default()); // subtract 1 to skip the trailing null character
                 gl::GetShaderInfoLog(r.id, len, ptr::null_mut(), buf.as_mut_ptr() as *mut GLchar);
 
                 return match str::from_utf8(&buf) {
@@ -69,7 +69,7 @@ impl ShaderBase {
     }
 
     // NEEDED BY Program
-    pub(crate) fn get_id(self: &Self) -> GLuint {
+    pub(crate) fn get_id(&self) -> GLuint {
         self.id
     }
 }
@@ -83,14 +83,14 @@ impl VertexShader {
         Ok(VertexShader(ShaderBase::new(src, gl::VERTEX_SHADER)?))
     }
 
-    pub fn get_shader_base(self: &Self) -> &ShaderBase {
+    pub fn get_shader_base(&self) -> &ShaderBase {
         &self.0
     }
 }
 
 impl Into<ShaderBase> for VertexShader {
     // Consume VertexShader and pass ownership of it's only value as output
-    fn into(self: Self) -> ShaderBase {
+    fn into(self) -> ShaderBase {
         self.0
     }
 }
@@ -100,14 +100,14 @@ impl FragmentShader {
     pub fn new(src: &str) -> Result<Self, String> {
         Ok(FragmentShader(ShaderBase::new(src, gl::FRAGMENT_SHADER)?))
     }
-    pub fn get_shader_base(self: &Self) -> &ShaderBase {
+    pub fn get_shader_base(&self) -> &ShaderBase {
         &self.0
     }
 }
 
 impl Into<ShaderBase> for FragmentShader {
     // Consume VertexShader and pass ownership of it's only value as output
-    fn into(self: Self) -> ShaderBase {
+    fn into(self) -> ShaderBase {
         self.0
     }
 }

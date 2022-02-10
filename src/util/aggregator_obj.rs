@@ -21,7 +21,7 @@ pub struct VAO {
 }
 
 impl Drop for VAO {
-    fn drop(self: &mut Self) {
+    fn drop(&mut self) {
         unsafe {
             gl::DeleteVertexArrays(1, &(self.id));
         }
@@ -40,17 +40,17 @@ impl VAO {
         UnboundVAO::from(r)
     }
 
-    fn bind_ao(self: &Self) {
+    fn bind_ao(&self) {
         unsafe {
             gl::BindVertexArray(self.id);
         }
     }
 
-    pub fn adapt_vao_to_program(self: &mut Self, p: &program::Program) -> Result<(), ()> {
+    pub fn adapt_vao_to_program(&mut self, p: &program::Program) -> Result<(), ()> {
         for l in p.get_attribute_hashmap().values() {
             // If the data index the program needs has not been attached throw error so it is
             // impossible to cause undefined behaviour
-            if !self.available_ind.contains(&l) {
+            if !self.available_ind.contains(l) {
                 return Err(());
             }
             unsafe {
@@ -65,7 +65,7 @@ impl VAO {
     /// however this dosen't actually convert the VBO on cpu
     /// it just sets a flag that tells the gpu to convert to f32
     pub fn attach_vbo_to_vao<ET>(
-        self: &mut Self,
+        &mut self,
         bo: &buffer_obj::VBO<ET>,
         index: GLuint,
         stride_ind: usize,
@@ -105,7 +105,7 @@ impl VAO {
                         gl_typ,
                         gl::FALSE,
                         i32::from(bo.get_elem_per_vertex().iter().sum::<u8>()) * size_of_datatype_in_bytes, // how many elements to skip each iteration
-                        (0 as *const u8).offset(unwrap_result_or_ret!(isize::try_from(jump_ahead), Err("Opengl can't properly hold the offset pointer so it can know where the elements for each attribute begin, i'm both impressed and horrified at the same time :)".to_owned()))) as *const std::ffi::c_void, // offset by stride once ( not every iteration ) to make sure skipping works and that we are reading the right elements
+                        ptr::null::<u8>().offset(unwrap_result_or_ret!(isize::try_from(jump_ahead), Err("Opengl can't properly hold the offset pointer so it can know where the elements for each attribute begin, i'm both impressed and horrified at the same time :)".to_owned()))) as *const std::ffi::c_void, // offset by stride once ( not every iteration ) to make sure skipping works and that we are reading the right elements
                     );
             }
         } else if is_int {
@@ -119,7 +119,7 @@ impl VAO {
                     bo.get_elem_per_vertex()[stride_ind].into(),
                     gl_typ,
                     i32::from(bo.get_elem_per_vertex().iter().sum::<u8>()) * size_of_datatype_in_bytes, // how many elements to skip each iteration
-                    (0 as *const u8).offset(unwrap_result_or_ret!(isize::try_from(jump_ahead), Err("Opengl can't properly hold the offset pointer so it can know where the elements for each attribute begin, i'm both impressed and horrified at the same time :)".to_owned()))) as *const std::ffi::c_void, // offset by stride once ( not every iteration ) to make sure skipping works and that we are reading the right elements
+                    ptr::null::<u8>().offset(unwrap_result_or_ret!(isize::try_from(jump_ahead), Err("Opengl can't properly hold the offset pointer so it can know where the elements for each attribute begin, i'm both impressed and horrified at the same time :)".to_owned()))) as *const std::ffi::c_void, // offset by stride once ( not every iteration ) to make sure skipping works and that we are reading the right elements
                 );
             }
         } else if gl_typ == GLdouble::get_gl_type() {
@@ -133,7 +133,7 @@ impl VAO {
                     bo.get_elem_per_vertex()[stride_ind].into(),
                     gl_typ,
                     i32::from(bo.get_elem_per_vertex().iter().sum::<u8>()) * size_of_datatype_in_bytes, // how many elements to skip each iteration
-                    (0 as *const u8).offset(unwrap_result_or_ret!(isize::try_from(jump_ahead), Err("Opengl can't properly hold the offset pointer so it can know where the elements for each attribute begin, i'm both impressed and horrified at the same time :)".to_owned()))) as *const std::ffi::c_void, // offset by stride once ( not every iteration ) to make sure skipping works and that we are reading the right elements
+                   ptr::null::<u8>().offset(unwrap_result_or_ret!(isize::try_from(jump_ahead), Err("Opengl can't properly hold the offset pointer so it can know where the elements for each attribute begin, i'm both impressed and horrified at the same time :)".to_owned()))) as *const std::ffi::c_void, // offset by stride once ( not every iteration ) to make sure skipping works and that we are reading the right elements
                 );
             }
         } else {

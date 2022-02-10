@@ -44,7 +44,7 @@ unsafe fn internal_gl_tex_image<const N: usize>(
     }
 }
 
-mod texture{
+mod priv_texture{
 use super::*;
 use gl::types::{GLenum, GLuint};
 use one_user::one_user;
@@ -88,7 +88,7 @@ impl<const N: usize, const TYP: GLenum> Texture<N, TYP> {
     }
 
     #[inline(always)]
-    pub fn set_min_filter_of_bound_tex(self: &mut Self, min_filter: GLuint) {
+    pub fn set_min_filter_of_bound_tex(&mut self, min_filter: GLuint) {
         unsafe {
             gl::TexParameteri(
                 TYP,
@@ -99,7 +99,7 @@ impl<const N: usize, const TYP: GLenum> Texture<N, TYP> {
     }
 
     #[inline(always)]
-    pub fn set_mag_filter_of_bound_tex(self: &mut Self, mag_filter: GLuint) {
+    pub fn set_mag_filter_of_bound_tex(&mut self, mag_filter: GLuint) {
         unsafe {
             gl::TexParameteri(
                 TYP,
@@ -110,28 +110,28 @@ impl<const N: usize, const TYP: GLenum> Texture<N, TYP> {
     }
 
     #[inline(always)]
-    pub fn set_x_wrap_of_bound_tex(self: &mut Self, wrap_x: GLint) {
+    pub fn set_x_wrap_of_bound_tex(&mut self, wrap_x: GLint) {
         unsafe {
             gl::TexParameteri(TYP, gl::TEXTURE_WRAP_S, wrap_x);
         }
     }
 
     #[inline(always)]
-    pub fn set_y_wrap_of_bound_tex(self: &mut Self, wrap_y: GLint) {
+    pub fn set_y_wrap_of_bound_tex(&mut self, wrap_y: GLint) {
         unsafe {
             gl::TexParameteri(TYP, gl::TEXTURE_WRAP_T, wrap_y);
         }
     }
 
     #[inline(always)]
-    pub fn set_z_wrap_of_bound_tex(self: &mut Self, wrap_z: GLint) {
+    pub fn set_z_wrap_of_bound_tex(&mut self, wrap_z: GLint) {
         unsafe {
             gl::TexParameteri(TYP, gl::TEXTURE_WRAP_R, wrap_z);
         }
     }
 
     pub fn upload_data_to_texture<ET>(
-        self: &mut Self,
+        &mut self,
         size: [usize; N],
         data: &[ET],
         format: GLenum,
@@ -191,18 +191,17 @@ impl<const N: usize, const TYP: GLenum> Texture<N, TYP> {
 }
 
 impl<const N: usize, const TYP: GLenum> Drop for Texture<N, TYP> {
-    fn drop(self: &mut Self) {
+    fn drop(&mut self) {
         unsafe {
             gl::DeleteTextures(1, &self.id);
         }
     }
 }
 
-
 }
 
-pub type Texture2D = texture::Texture<2, { gl::TEXTURE_2D }>;
-pub type Texture2DArr = texture::Texture<3, { gl::TEXTURE_2D_ARRAY }>;
-pub type Texture3D = texture::Texture<3, { gl::TEXTURE_3D }>;
+pub type Texture2D = priv_texture::Texture<2, { gl::TEXTURE_2D }>;
+pub type Texture2DArr = priv_texture::Texture<3, { gl::TEXTURE_2D_ARRAY }>;
+pub type Texture3D = priv_texture::Texture<3, { gl::TEXTURE_3D }>;
 
-pub type TextureBouncer<const SLOT: usize> = texture::TextureBouncer<SLOT>;
+pub type TextureBouncer<const SLOT: usize> = priv_texture::TextureBouncer<SLOT>;

@@ -10,7 +10,7 @@ use gl_wrapper::HasGLEnum;
 use glutin::dpi::PhysicalSize;
 use std::convert::TryInto;
 
-use gl::{types::*, VERSION, TEXTURE28};
+use gl::types::*;
 use std::ptr;
 use std::str;
 
@@ -138,7 +138,7 @@ fn main() {
     let mut a = aggregator_obj::VAO::new();
     let mut a = a.bind_mut( &mut vao_bouncer);
 
-    let mut INTERLACED_DATA: Vec<f32> = Vec::new();
+    let mut interlaced_data: Vec<f32> = Vec::new();
 {
     let mut a = POS_DATA.iter();
     let mut b = TEX_DATA.iter();
@@ -147,13 +147,13 @@ fn main() {
         let mut b_ended = false;
         for _ in 1..=2{ 
         if let Some(v) = a.next(){
-            INTERLACED_DATA.push(*v);
+            interlaced_data.push(*v);
         }else{a_ended = true;}
         }
 
         for _ in 1..=2{
         if let Some(v) = b.next(){
-            INTERLACED_DATA.push(*v);
+            interlaced_data.push(*v);
         }else{b_ended = true;}
         }
 
@@ -163,7 +163,7 @@ fn main() {
     let postex_vbo = buffer_obj::VBO::<GLfloat>::with_data(
         &mut vbo_bouncer,
         &[2, 2],
-            &INTERLACED_DATA, 
+            &interlaced_data, 
         gl::STATIC_DRAW,
     )
     .expect("Uploading pos data to vbo!");

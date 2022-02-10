@@ -40,7 +40,7 @@ impl<ET> BOBase<ET> {
 }
 
 impl<ET> Drop for BOBase<ET> {
-    fn drop(self: &mut Self) {
+    fn drop(&mut self) {
         // Drop ET array on gpu
         unsafe {
             gl::DeleteBuffers(1, &(self.id));
@@ -74,12 +74,12 @@ impl<'a, ET: 'a> VBO<'a, ET> {
         Ok(r)
     }
 
-    pub fn get_elem_per_vertex(self: &Self) -> &'a [u8] {
+    pub fn get_elem_per_vertex(&self) -> &'a [u8] {
         self.1
     }
 
     // NOTE: This dosen't just return a value it uses two values in the struct to compute this value so it's not as lightweight as other getters
-    pub fn get_num_of_vertices(self: &Self) -> GLsizeiptr {
+    pub fn get_num_of_vertices(&self) -> GLsizeiptr {
         let mut sum: GLsizeiptr = 0;
         for e in self.get_elem_per_vertex() {
             sum += GLsizeiptr::from(*e);
@@ -87,7 +87,7 @@ impl<'a, ET: 'a> VBO<'a, ET> {
         self.get_size() / sum
     }
 
-    pub fn upload_to_bound_bo(self: &mut Self, data: &[ET], usage: GLenum) -> Result<(), String> {
+    pub fn upload_to_bound_bo(&mut self, data: &[ET], usage: GLenum) -> Result<(), String> {
         self.0.size = unwrap_result_or_ret!(
             GLsizeiptr::try_from(data.len()),
             Err("Too many elements in data slice for opengl!".to_owned())
@@ -122,7 +122,7 @@ impl<ET> IBO<ET> {
         Ok(r)
     }
 
-    pub fn upload_to_bo(self: &mut Self, data: &[ET], usage: GLenum) -> Result<(), String> {
+    pub fn upload_to_bo(&mut self, data: &[ET], usage: GLenum) -> Result<(), String> {
         self.0.size = unwrap_result_or_ret!(
             GLsizeiptr::try_from(data.len()),
             Err("Too many elements in data slice for opengl!".to_owned())
@@ -148,15 +148,15 @@ where
     Self: HasGLEnum,
 {
     #[inline(always)]
-    fn bind_bo(self: &Self) {
+    fn bind_bo(&self) {
         unsafe { gl::BindBuffer(Self::get_gl_type(), self.get_bo_base().id) }
     }
 
     #[inline(always)]
-    fn get_size(self: &Self) -> GLsizeiptr {
+    fn get_size(&self) -> GLsizeiptr {
         self.get_bo_base().size
     }
-    fn get_bo_base(self: &Self) -> &BOBase<ET>;
+    fn get_bo_base(&self) -> &BOBase<ET>;
 }
 
 unsafe impl<'a, ET> HasGLEnum for VBO<'a, ET> {
@@ -175,14 +175,14 @@ unsafe impl<ET> HasGLEnum for IBO<ET> {
 
 impl<'a, ET> BOFunc<ET> for VBO<'a, ET> {
     #[inline(always)]
-    fn get_bo_base(self: &Self) -> &BOBase<ET> {
+    fn get_bo_base(&self) -> &BOBase<ET> {
         &self.0
     }
 }
 
 impl<ET> BOFunc<ET> for IBO<ET> {
     #[inline(always)]
-    fn get_bo_base(self: &Self) -> &BOBase<ET> {
+    fn get_bo_base(&self) -> &BOBase<ET> {
         &self.0
     }
 }
